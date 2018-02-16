@@ -1,26 +1,48 @@
+/*
+ * Copyright (C) 2018. MineGaming - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the LGPLv3 license, which unfortunately won't be
+ * written for another century.
+ *
+ *  You should have received a copy of the LGPLv3 license with
+ *  this file. If not, please write to: niklas.linz@enigmar.de
+ *
+ */
+
 package de.linzn.mineGuild.database;
 
 
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
+import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.UUID;
 
 public class GuildDatabase {
-    private static HashMap<String, GuildPlayer> guildPlayers = new HashMap<>();
     private static HashMap<UUID, Guild> guilds = new HashMap<>();
 
-    public static GuildPlayer getGuildPlayer(String name) {
-        return guildPlayers.getOrDefault(name.toLowerCase(), null);
+    public static GuildPlayer getGuildPlayer(String playerName) {
+        UUID playerUUID = null;
+        if (ProxyServer.getInstance().getPlayer(playerName) != null) {
+            playerUUID = ProxyServer.getInstance().getPlayer(playerName).getUniqueId();
+        }
+        if (playerUUID == null) {
+            playerUUID = BungeeQuery.getUUID(playerName);
+        }
+
+        return getGuildPlayer(playerUUID);
+
     }
 
-    public static GuildPlayer getGuildPlayer(UUID uuid) {
-        for (GuildPlayer player : guildPlayers.values()) {
-            if (player.getUUID().toString().equalsIgnoreCase(uuid.toString())) {
-                return player;
+    public static GuildPlayer getGuildPlayer(UUID playerUUID) {
+        for (Guild guild : guilds.values()) {
+            for (GuildPlayer guildPlayer : guild.guildPlayers) {
+                if (guildPlayer.getUUID() == playerUUID) {
+                    return guildPlayer;
+                }
             }
         }
         return null;
@@ -45,48 +67,14 @@ public class GuildDatabase {
     }
 
     public static boolean isGuild(String gName) {
-        for (Guild g : guilds.values()) {
-            if (g.guildName.equalsIgnoreCase(gName)) {
+        for (Guild guild : guilds.values()) {
+            if (guild.guildName.equalsIgnoreCase(gName)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean isPlayerOnline(String pName) {
-        return guildPlayers.containsKey(pName.toLowerCase());
-    }
-
-    public static boolean isPlayerOnline(UUID uuid) {
-        for (GuildPlayer player : guildPlayers.values()) {
-            if (player.getUUID().toString().equalsIgnoreCase(uuid.toString())) {
-                return true;
-            }
-        }
-        return false;
-
-    }
-
-    public static void addGuildPlayer(GuildPlayer gPlayer) {
-        guildPlayers.put(gPlayer.getName().toLowerCase(), gPlayer);
-    }
-
-    public static void removeGuildPlayer(String gPlayername) {
-        guildPlayers.remove(gPlayername.toLowerCase());
-    }
-
-
-    public static void removeGuildPlayersFromGuild(UUID uuid) {
-        HashSet<GuildPlayer> updatePlayers = new HashSet<>();
-        for (GuildPlayer guildPlayer : guildPlayers.values()) {
-            if (guildPlayer.getGuild() != null && guildPlayer.getGuild().guildUUID == uuid) {
-                updatePlayers.add(guildPlayer);
-            }
-        }
-        for (GuildPlayer guildPlayer : updatePlayers) {
-            removeGuildPlayer(guildPlayer.getName());
-        }
-    }
 
     public static void addGuild(Guild guild) {
         guilds.put(guild.guildUUID, guild);
@@ -96,9 +84,5 @@ public class GuildDatabase {
         guilds.remove(uuid);
     }
 
-    public static Collection<GuildPlayer> getOnlineGuildPlayers() {
-        return guildPlayers.values();
-
-    }
 
 }

@@ -1,3 +1,14 @@
+/*
+ * Copyright (C) 2018. MineGaming - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the LGPLv3 license, which unfortunately won't be
+ * written for another century.
+ *
+ *  You should have received a copy of the LGPLv3 license with
+ *  this file. If not, please write to: niklas.linz@enigmar.de
+ *
+ */
+
 package de.linzn.mineGuild.database.mysql;
 
 import de.linzn.mineGuild.objects.Guild;
@@ -5,10 +16,7 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
 import de.linzn.mineSuite.bungee.database.mysql.setup.MySQLConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
@@ -31,8 +39,8 @@ public class GuildQuery {
                 insert.executeUpdate();
                 insert.close();
                 success = true;
-                setGuildRangs(guild);
-                setGuildPlayers(guild);
+                private_set_guild_rangs(guild);
+                private_set_guild_players(guild);
             }
             result.close();
             sql.close();
@@ -43,7 +51,7 @@ public class GuildQuery {
         return success;
     }
 
-    private static void setGuildRangs(Guild guild) {
+    private static void private_set_guild_rangs(Guild guild) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
@@ -51,18 +59,14 @@ public class GuildQuery {
             for (GuildRang guildRang : guild.guildRangs) {
                 insert = conn
                         .prepareStatement("INSERT INTO guild_rang (guild_uuid, rang_name) VALUES ('"
-                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "');");
+                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "');", Statement.RETURN_GENERATED_KEYS);
                 insert.executeUpdate();
-
-                insert = conn.prepareStatement("SELECT id FROM guild_rang WHERE guild_uuid = '" + guild.guildUUID.toString() + "' AND rang_name = '" + guildRang.rangName + "';");
-                ResultSet result = insert.executeQuery();
-                int rang_id = -1;
+                /* Get id of the new rang */
+                ResultSet result = insert.getGeneratedKeys();
                 if (result.next()) {
-                    rang_id = result.getInt("id");
+                    guildRang.setRangId(result.getInt(1));
                 }
-                guildRang.setRangId(rang_id);
-
-                setRangPermissions(guildRang);
+                private_set_rang_permissions(guildRang);
             }
             if (insert != null) {
                 insert.close();
@@ -73,7 +77,7 @@ public class GuildQuery {
         }
     }
 
-    private static void setRangPermissions(GuildRang guildRang) {
+    private static void private_set_rang_permissions(GuildRang guildRang) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
@@ -93,7 +97,7 @@ public class GuildQuery {
         }
     }
 
-    private static void setGuildPlayers(Guild guild) {
+    private static void private_set_guild_players(Guild guild) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
@@ -104,13 +108,12 @@ public class GuildQuery {
                 if (result.next()) {
                     insert = conn
                             .prepareStatement("UPDATE guild_entities SET guild_uuid = '" + guild.guildUUID.toString() + "', guild_rang = '" + guildPlayer.getGuildRang().rangName + "';");
-                    insert.executeUpdate();
                 } else {
                     insert = conn
                             .prepareStatement("INSERT INTO guild_entities (player_uuid, guild_uuid, guild_rang) VALUES ('"
                                     + guildPlayer.getUUID() + "', '" + guild.guildUUID + "', '" + guildPlayer.getGuildRang().rangName + "');");
-                    insert.executeUpdate();
                 }
+                insert.executeUpdate();
             }
             if (insert != null) {
                 insert.close();
@@ -126,22 +129,73 @@ public class GuildQuery {
 
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         boolean success = false;
+        private_unset_guild_rangs(guildUUID);
+        private_unset_guild_players(guildUUID);
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
-            PreparedStatement sql = conn.prepareStatement(
-                    "SELECT GuildUUID FROM guild_object WHERE guild_uuid = '" + guildUUID.toString() + "';");
-            ResultSet result = sql.executeQuery();
-            if (result.next()) {
-                PreparedStatement update1 = conn.prepareStatement(
-                        "DELETE FROM guild_object WHERE guild_uuid = '" + guildUUID.toString() + "';");
-                update1.executeUpdate();
-                update1.close();
-                success = true;
-            }
-            result.close();
-            sql.close();
+            PreparedStatement update1 = conn.prepareStatement(
+                    "DELETE FROM guild_object WHERE guild_uuid = '" + guildUUID.toString() + "';");
+            update1.executeUpdate();
+            update1.close();
             manager.release("MineSuiteGuild", conn);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
 
+    private static boolean private_unset_guild_rangs(UUID guildUUID) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement update1;
+            update1 = conn.prepareStatement("SELECT id FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
+            ResultSet result = update1.executeQuery();
+            while (result.next()) {
+                success = private_unset_guild_permissions(result.getInt("id"));
+            }
+            update1 = conn.prepareStatement(
+                    "DELETE FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
+            update1.executeUpdate();
+            update1.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
+    private static boolean private_unset_guild_permissions(int rang_id) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement update1 = conn.prepareStatement(
+                    "DELETE FROM guild_rang_permission WHERE rang_id = '" + rang_id + "';");
+            update1.executeUpdate();
+            update1.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
+    private static boolean private_unset_guild_players(UUID guildUUID) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement update1 = conn.prepareStatement(
+                    "DELETE FROM guild_entities WHERE guild_uuid = '" + guildUUID + "';");
+            update1.executeUpdate();
+            update1.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -192,13 +246,13 @@ public class GuildQuery {
                 guild.setLevel(result.getInt("guild_level"));
                 guild.setTotalExp(result.getLong("guild_experience"));
 
-                ArrayList<GuildRang> guildRangs = getGuildRangs(guildUUID);
+                ArrayList<GuildRang> guildRangs = private_get_guild_rangs(guildUUID);
                 /* add to list */
                 for (GuildRang guildRang : guildRangs) {
                     guild.setGuildRang(guildRang);
                 }
 
-                ArrayList<GuildPlayer> guildPlayers = getGuildPlayers(guildUUID);
+                ArrayList<GuildPlayer> guildPlayers = private_get_guild_players(guildUUID);
                 /* add to list */
                 for (GuildPlayer guildPlayer : guildPlayers) {
                     guildPlayer.setGuild(guild);
@@ -215,7 +269,7 @@ public class GuildQuery {
         return guild;
     }
 
-    private static ArrayList<GuildRang> getGuildRangs(UUID guildUUID) {
+    private static ArrayList<GuildRang> private_get_guild_rangs(UUID guildUUID) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         ArrayList<GuildRang> rangList = new ArrayList<>();
         try {
@@ -228,7 +282,7 @@ public class GuildQuery {
                 String rang_name = result.getString("rang_name");
                 GuildRang guildRang = new GuildRang(rang_name);
                 guildRang.setRangId(rang_id);
-                ArrayList<String> permissions = getRangPermission(rang_id);
+                ArrayList<String> permissions = private_get_rang_permission(rang_id);
                 for (String permission : permissions) {
                     guildRang.setPermission(permission);
                 }
@@ -245,7 +299,7 @@ public class GuildQuery {
         return rangList;
     }
 
-    private static ArrayList<String> getRangPermission(int rang_id) {
+    private static ArrayList<String> private_get_rang_permission(int rang_id) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         ArrayList<String> permissions = new ArrayList<>();
         try {
@@ -267,7 +321,7 @@ public class GuildQuery {
         return permissions;
     }
 
-    private static ArrayList<GuildPlayer> getGuildPlayers(UUID guildUUID) {
+    private static ArrayList<GuildPlayer> private_get_guild_players(UUID guildUUID) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         ArrayList<GuildPlayer> guildPlayers = new ArrayList<>();
         try {

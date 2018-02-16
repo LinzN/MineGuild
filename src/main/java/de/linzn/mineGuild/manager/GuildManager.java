@@ -16,6 +16,7 @@ import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.database.mysql.GuildQuery;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
+import de.linzn.mineGuild.objects.GuildRang;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -24,28 +25,52 @@ import java.util.UUID;
 
 public class GuildManager {
 
-    public static void createGuild(String guildName, UUID creator) {
+
+    /* ##########################
+     * Private guild functions
+      ##########################*/
+
+    private static void create_guild(String guildName, UUID creator) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
         if (player == null) {
             return;
         }
 
+        // todo check if is already in guild
         if (GuildDatabase.isGuild(guildName)) {
             player.sendMessage("Diese Gilde gibt es bereits");
             return;
         }
         UUID guildUUID = UUID.randomUUID();
-        Guild guild = new Guild(guildName, guildUUID);
-        if (!GuildQuery.setGuild(guild)) {
+        Guild tempGuild = new Guild(guildName, guildUUID);
+
+        /* Set default rang */
+        GuildRang masterRang = getDefaultRang("static_master");
+        tempGuild.setGuildRang(masterRang);
+        GuildRang assistantRang = getDefaultRang("assistant");
+        tempGuild.setGuildRang(assistantRang);
+        GuildRang memberRang = getDefaultRang("static_member");
+        tempGuild.setGuildRang(memberRang);
+
+        /* Set master */
+        GuildPlayer owner = new GuildPlayer(creator);
+        owner.setGuild(tempGuild);
+        owner.setRangName(masterRang.rangName);
+        tempGuild.setGuildPlayer(owner);
+
+        /* Add guild to mysql */
+        if (!GuildQuery.setGuild(tempGuild)) {
             player.sendMessage("Fehler in der datenbank!");
             return;
         }
+
+        /* Load real guild from database */
+        Guild guild = GuildQuery.getGuild(guildUUID);
         GuildDatabase.addGuild(guild);
         // todo send socket msg
-        // todo add guildmaster add player
     }
 
-    public static void removeGuild(String guildName, UUID creator) {
+    private static void remove_guild(String guildName, UUID creator) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
         if (player == null) {
             return;
@@ -66,28 +91,40 @@ public class GuildManager {
             return;
         }
         /* remove loaded guild */
-        GuildDatabase.removeGuildPlayersFromGuild(guild.guildUUID);
         GuildDatabase.removeGuild(guild.guildUUID);
         // todo send socket msg
     }
 
-    public static void addPlayerToGuild(UUID guildUUID, UUID actionUUID, UUID invitedUUID) {
-        ProxiedPlayer actionPlayer = ProxyServer.getInstance().getPlayer(actionUUID);
+    private static void add_player_to_guild(UUID guildUUID, UUID invitedUUID) {
         ProxiedPlayer invitedPlayer = ProxyServer.getInstance().getPlayer(invitedUUID);
-        if (actionPlayer == null || invitedPlayer == null) {
+        if (invitedPlayer == null) {
             //not online
             return;
         }
         Guild guild = GuildDatabase.getGuild(guildUUID);
         if (guild == null) {
-            actionPlayer.sendMessage("Diese Gilde gibt es nicht");
             return;
         }
-
         GuildPlayer guildPlayer = new GuildPlayer(invitedPlayer.getUniqueId());
-        // todo other rang system
+        guildPlayer.setRangName("member");
+        // todo add to database mysql
+        guildPlayer.setGuild(guild);
+        guild.setGuildPlayer(guildPlayer);
+        // todo send socket msg
+    }
 
-        GuildDatabase.addGuildPlayer(guildPlayer);
+    private static void remove_player_from_guild(UUID guildUUID, UUID removedUUID) {
+        Guild guild = GuildDatabase.getGuild(guildUUID);
+        if (guild == null) {
+            return;
+        }
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(removedUUID);
+        if (guildPlayer == null) {
+            return;
+        }
+        guildPlayer.setGuild(null);
+        guild.unsetGuildPlayer(guildPlayer);
+        // remove database player
         // todo send socket msg
     }
 
@@ -96,9 +133,23 @@ public class GuildManager {
         HashSet<Guild> guilds = GuildQuery.getAllGuilds();
         for (Guild guild : guilds) {
             GuildDatabase.addGuild(guild);
-            MineGuildPlugin.inst().getLogger().info("Load guild " + guild.guildName);
+            MineGuildPlugin.inst().getLogger().info("Loading -> Guild: " + guild.guildName + " Rangs: " + guild.guildRangs.size() + " Members: " + guild.guildPlayers.size());
         }
         MineGuildPlugin.inst().getLogger().info("Loaded " + GuildDatabase.getGuilds().size() + " Guilds!");
-        // todo load online players if is a reload
+    }
+
+    private static GuildRang getDefaultRang(String rangName) {
+        GuildRang rang = null;
+        if (rangName.equalsIgnoreCase("static_master")) {
+            rang = new GuildRang("static_master");
+            rang.setPermission("test1");
+        } else if (rangName.equalsIgnoreCase("assistant")) {
+            rang = new GuildRang("assistant");
+            rang.setPermission("test2");
+        } else if (rangName.equalsIgnoreCase("static_member")) {
+            rang = new GuildRang("static_member");
+            rang.setPermission("test3");
+        }
+        return rang;
     }
 }
