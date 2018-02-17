@@ -12,30 +12,28 @@
 package de.linzn.mineGuild.objects;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class GuildRang {
-    public int rangId;
+    public UUID rangUUID;
     public String rangName;
-    public ArrayList<String> permissions;
+    public ArrayList<GuildPermission> permissions;
 
-    public GuildRang(String rangName) {
+    public GuildRang(String rangName, UUID rangUUID) {
         this.rangName = rangName.toUpperCase();
+        this.rangUUID = rangUUID;
         this.permissions = new ArrayList<>();
     }
 
-    public void setRangId(int rangId) {
-        this.rangId = rangId;
+    public boolean hasPermission(GuildPermission permission) {
+        return this.permissions.contains(permission);
     }
 
-    public boolean hasPermission(String permission) {
-        return this.permissions.contains(permission.toUpperCase());
+    public void setPermission(GuildPermission permission) {
+        permissions.add(permission);
     }
 
-    public void setPermission(String permission) {
-        permissions.add(permission.toUpperCase());
-    }
-
-    public void unsetPermission(String permission) {
-        permissions.remove(permission.toUpperCase());
+    public void unsetPermission(GuildPermission permission) {
+        permissions.remove(permission);
     }
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 public class GuildPlayer {
     private Guild guild;
     private UUID playerUUID;
-    private String rangName;
+    private UUID rangUUID;
 
     public GuildPlayer(UUID playerUUID) {
         this.playerUUID = playerUUID;
@@ -32,12 +32,12 @@ public class GuildPlayer {
         this.guild = guild;
     }
 
-    public void setRangName(String rangName) {
-        this.rangName = rangName;
+    public void setRangUUID(UUID rangUUID) {
+        this.rangUUID = rangUUID;
     }
 
     public GuildRang getGuildRang() {
-        return this.guild.getGuildRang(rangName);
+        return this.guild.getGuildRang(rangUUID);
     }
 
 

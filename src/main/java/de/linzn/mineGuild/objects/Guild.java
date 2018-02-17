@@ -58,7 +58,16 @@ public class Guild {
         return null;
     }
 
-    public boolean hasPermission(GuildPlayer guildPlayer, String permission) {
+    public GuildRang getGuildRang(UUID rangUUID) {
+        for (GuildRang guildRang : this.guildRangs) {
+            if (guildRang.rangUUID.equals(rangUUID)) {
+                return guildRang;
+            }
+        }
+        return null;
+    }
+
+    public boolean hasPermission(GuildPlayer guildPlayer, GuildPermission permission) {
         return guildPlayer.getGuildRang().hasPermission(permission);
     }
 

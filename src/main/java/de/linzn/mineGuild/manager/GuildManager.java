@@ -15,6 +15,7 @@ import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.database.mysql.GuildQuery;
 import de.linzn.mineGuild.objects.Guild;
+import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
 import net.md_5.bungee.api.ProxyServer;
@@ -25,22 +26,55 @@ import java.util.UUID;
 
 public class GuildManager {
 
+    public static void establishGuild(String guildName, UUID creator) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
+        if (player == null) {
+            return;
+        }
+        if (GuildDatabase.getGuildPlayer(creator) != null) {
+            player.sendMessage("Du bist bereits in einer Gilde!");
+            return;
+        }
+
+        if (GuildDatabase.isGuild(guildName)) {
+            player.sendMessage("Diese Gilde gibt es bereits");
+            return;
+        }
+
+        if (create_guild(guildName, creator)) {
+            player.sendMessage("Gilde wurde erstellt!");
+        }
+    }
+
+    public static void disbandGuild(UUID actor) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        if (player == null) {
+            return;
+        }
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+        if (guildPlayer == null) {
+            player.sendMessage("Du bist in keiner Gilde!");
+            return;
+        }
+
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.DELETE)) {
+            player.sendMessage("Du hast dazu keine Berechtigung!");
+            return;
+        }
+
+        if (remove_guild(guildPlayer.getGuild().guildUUID, actor)) {
+            player.sendMessage("Gilde wurde aufgelöst!");
+        }
+    }
+
 
     /* ##########################
      * Private guild functions
       ##########################*/
 
-    private static void create_guild(String guildName, UUID creator) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
-        if (player == null) {
-            return;
-        }
-
-        // todo check if is already in guild
-        if (GuildDatabase.isGuild(guildName)) {
-            player.sendMessage("Diese Gilde gibt es bereits");
-            return;
-        }
+    private static boolean create_guild(String guildName, UUID creator) {
         UUID guildUUID = UUID.randomUUID();
         Guild tempGuild = new Guild(guildName, guildUUID);
 
@@ -55,44 +89,38 @@ public class GuildManager {
         /* Set master */
         GuildPlayer owner = new GuildPlayer(creator);
         owner.setGuild(tempGuild);
-        owner.setRangName(masterRang.rangName);
+        owner.setRangUUID(masterRang.rangUUID);
         tempGuild.setGuildPlayer(owner);
 
         /* Add guild to mysql */
         if (!GuildQuery.setGuild(tempGuild)) {
-            player.sendMessage("Fehler in der datenbank!");
-            return;
+            MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
+            return false;
         }
 
         /* Load real guild from database */
         Guild guild = GuildQuery.getGuild(guildUUID);
         GuildDatabase.addGuild(guild);
         // todo send socket msg
+        return true;
     }
 
-    private static void remove_guild(String guildName, UUID creator) {
+    private static boolean remove_guild(UUID guildUUID, UUID creator) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
         if (player == null) {
-            return;
+            return false;
         }
-
-        // todo check permissions of rang
-
-        Guild guild = GuildDatabase.getGuild(guildName);
-
-        if (guild == null) {
-            player.sendMessage("Diese Gilde gibt es nicht");
-            return;
-        }
+        Guild guild = GuildDatabase.getGuild(guildUUID);
 
         /* remove guild from database */
         if (!GuildQuery.unsetGuild(guild.guildUUID)) {
-            player.sendMessage("Fehler in der datenbank!");
-            return;
+            MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
+            return false;
         }
         /* remove loaded guild */
         GuildDatabase.removeGuild(guild.guildUUID);
         // todo send socket msg
+        return true;
     }
 
     private static void add_player_to_guild(UUID guildUUID, UUID invitedUUID) {
@@ -106,7 +134,7 @@ public class GuildManager {
             return;
         }
         GuildPlayer guildPlayer = new GuildPlayer(invitedPlayer.getUniqueId());
-        guildPlayer.setRangName("member");
+        guildPlayer.setRangUUID(guild.getGuildRang("static_member").rangUUID);
         // todo add to database mysql
         guildPlayer.setGuild(guild);
         guild.setGuildPlayer(guildPlayer);
@@ -141,14 +169,20 @@ public class GuildManager {
     private static GuildRang getDefaultRang(String rangName) {
         GuildRang rang = null;
         if (rangName.equalsIgnoreCase("static_master")) {
-            rang = new GuildRang("static_master");
-            rang.setPermission("test1");
+            rang = new GuildRang("static_master", UUID.randomUUID());
+            for (GuildPermission guildPermission : GuildPermission.values()) {
+                rang.setPermission(guildPermission);
+            }
         } else if (rangName.equalsIgnoreCase("assistant")) {
-            rang = new GuildRang("assistant");
-            rang.setPermission("test2");
+            rang = new GuildRang("assistant", UUID.randomUUID());
+            rang.setPermission(GuildPermission.INVITE);
+            rang.setPermission(GuildPermission.DEPOSIT);
+            rang.setPermission(GuildPermission.SETRANG);
         } else if (rangName.equalsIgnoreCase("static_member")) {
-            rang = new GuildRang("static_member");
-            rang.setPermission("test3");
+            rang = new GuildRang("static_member", UUID.randomUUID());
+            rang.setPermission(GuildPermission.HOME);
+            rang.setPermission(GuildPermission.HELP);
+            rang.setPermission(GuildPermission.INFO);
         }
         return rang;
     }

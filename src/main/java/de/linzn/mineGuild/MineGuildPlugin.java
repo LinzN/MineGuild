@@ -31,6 +31,6 @@ public class MineGuildPlugin extends Plugin {
     public void onEnable() {
         inst = this;
         GuildManager.loadData();
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineSuiteGuild", new JServerGuildListener());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild", new JServerGuildListener());
     }
 }

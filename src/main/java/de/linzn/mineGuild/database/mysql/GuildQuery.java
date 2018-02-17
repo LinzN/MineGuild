@@ -12,11 +12,15 @@
 package de.linzn.mineGuild.database.mysql;
 
 import de.linzn.mineGuild.objects.Guild;
+import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
 import de.linzn.mineSuite.bungee.database.mysql.setup.MySQLConnectionManager;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
@@ -58,14 +62,9 @@ public class GuildQuery {
             PreparedStatement insert = null;
             for (GuildRang guildRang : guild.guildRangs) {
                 insert = conn
-                        .prepareStatement("INSERT INTO guild_rang (guild_uuid, rang_name) VALUES ('"
-                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "');", Statement.RETURN_GENERATED_KEYS);
+                        .prepareStatement("INSERT INTO guild_rang (rang_uuid, guild_uuid, rang_name) VALUES ('" + guildRang.rangUUID.toString() + "', '"
+                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "');");
                 insert.executeUpdate();
-                /* Get id of the new rang */
-                ResultSet result = insert.getGeneratedKeys();
-                if (result.next()) {
-                    guildRang.setRangId(result.getInt(1));
-                }
                 private_set_rang_permissions(guildRang);
             }
             if (insert != null) {
@@ -82,10 +81,10 @@ public class GuildQuery {
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement insert = null;
-            for (String permission : guildRang.permissions) {
+            for (GuildPermission permission : guildRang.permissions) {
                 insert = conn
-                        .prepareStatement("INSERT INTO guild_rang_permission (rang_id, permission) VALUES ('"
-                                + guildRang.rangId + "', '" + permission + "');");
+                        .prepareStatement("INSERT INTO guild_rang_permission (rang_uuid, permission) VALUES ('"
+                                + guildRang.rangUUID.toString() + "', '" + permission.getValue() + "');");
                 insert.executeUpdate();
             }
             if (insert != null) {
@@ -107,11 +106,11 @@ public class GuildQuery {
                 ResultSet result = insert.executeQuery();
                 if (result.next()) {
                     insert = conn
-                            .prepareStatement("UPDATE guild_entities SET guild_uuid = '" + guild.guildUUID.toString() + "', guild_rang = '" + guildPlayer.getGuildRang().rangName + "';");
+                            .prepareStatement("UPDATE guild_entities SET guild_uuid = '" + guild.guildUUID.toString() + "', guild_rang = '" + guildPlayer.getGuildRang().rangUUID.toString() + "' WHERE player_uuid = '" + guildPlayer.getUUID() + "';");
                 } else {
                     insert = conn
                             .prepareStatement("INSERT INTO guild_entities (player_uuid, guild_uuid, guild_rang) VALUES ('"
-                                    + guildPlayer.getUUID() + "', '" + guild.guildUUID + "', '" + guildPlayer.getGuildRang().rangName + "');");
+                                    + guildPlayer.getUUID() + "', '" + guild.guildUUID + "', '" + guildPlayer.getGuildRang().rangUUID.toString() + "');");
                 }
                 insert.executeUpdate();
             }
@@ -151,10 +150,10 @@ public class GuildQuery {
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement update1;
-            update1 = conn.prepareStatement("SELECT id FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
+            update1 = conn.prepareStatement("SELECT rang_uuid FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
             ResultSet result = update1.executeQuery();
             while (result.next()) {
-                success = private_unset_guild_permissions(result.getInt("id"));
+                success = private_unset_guild_permissions(UUID.fromString(result.getString("rang_uuid")));
             }
             update1 = conn.prepareStatement(
                     "DELETE FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
@@ -168,13 +167,13 @@ public class GuildQuery {
         return success;
     }
 
-    private static boolean private_unset_guild_permissions(int rang_id) {
+    private static boolean private_unset_guild_permissions(UUID rang_uuid) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         boolean success = false;
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement update1 = conn.prepareStatement(
-                    "DELETE FROM guild_rang_permission WHERE rang_id = '" + rang_id + "';");
+                    "DELETE FROM guild_rang_permission WHERE rang_uuid = '" + rang_uuid.toString() + "';");
             update1.executeUpdate();
             update1.close();
             manager.release("MineSuiteGuild", conn);
@@ -275,15 +274,14 @@ public class GuildQuery {
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement sql = conn.prepareStatement(
-                    "SELECT id, rang_name FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
+                    "SELECT rang_uuid, rang_name FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
             ResultSet result = sql.executeQuery();
-            if (result.next()) {
-                int rang_id = result.getInt("id");
+            while (result.next()) {
+                UUID rang_uuid = UUID.fromString(result.getString("rang_uuid"));
                 String rang_name = result.getString("rang_name");
-                GuildRang guildRang = new GuildRang(rang_name);
-                guildRang.setRangId(rang_id);
-                ArrayList<String> permissions = private_get_rang_permission(rang_id);
-                for (String permission : permissions) {
+                GuildRang guildRang = new GuildRang(rang_name, rang_uuid);
+                ArrayList<GuildPermission> permissions = private_get_rang_permission(rang_uuid);
+                for (GuildPermission permission : permissions) {
                     guildRang.setPermission(permission);
                 }
                 /* add to list */
@@ -299,18 +297,18 @@ public class GuildQuery {
         return rangList;
     }
 
-    private static ArrayList<String> private_get_rang_permission(int rang_id) {
+    private static ArrayList<GuildPermission> private_get_rang_permission(UUID rang_uuid) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
-        ArrayList<String> permissions = new ArrayList<>();
+        ArrayList<GuildPermission> permissions = new ArrayList<>();
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement sql = conn.prepareStatement(
-                    "SELECT permission FROM guild_rang_permission WHERE rang_id = '" + rang_id + "';");
+                    "SELECT permission FROM guild_rang_permission WHERE rang_uuid = '" + rang_uuid.toString() + "';");
             ResultSet result = sql.executeQuery();
-            if (result.next()) {
+            while (result.next()) {
                 String permission = result.getString("permission");
                 /* add to list */
-                permissions.add(permission);
+                permissions.add(GuildPermission.getPerm(permission));
             }
             result.close();
             sql.close();
@@ -329,11 +327,11 @@ public class GuildQuery {
             PreparedStatement sql = conn.prepareStatement(
                     "SELECT player_uuid, guild_rang FROM guild_entities WHERE guild_uuid = '" + guildUUID.toString() + "';");
             ResultSet result = sql.executeQuery();
-            if (result.next()) {
+            while (result.next()) {
                 UUID playerUUID = UUID.fromString(result.getString("player_uuid"));
-                String guildRang = result.getString("guild_rang");
+                UUID guild_rang_uuid = UUID.fromString(result.getString("guild_rang"));
                 GuildPlayer guildPlayer = new GuildPlayer(playerUUID);
-                guildPlayer.setRangName(guildRang);
+                guildPlayer.setRangUUID(guild_rang_uuid);
                 /* add to list */
                 guildPlayers.add(guildPlayer);
             }

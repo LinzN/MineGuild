@@ -40,7 +40,7 @@ public class GuildDatabase {
     public static GuildPlayer getGuildPlayer(UUID playerUUID) {
         for (Guild guild : guilds.values()) {
             for (GuildPlayer guildPlayer : guild.guildPlayers) {
-                if (guildPlayer.getUUID() == playerUUID) {
+                if (guildPlayer.getUUID().equals(playerUUID)) {
                     return guildPlayer;
                 }
             }
