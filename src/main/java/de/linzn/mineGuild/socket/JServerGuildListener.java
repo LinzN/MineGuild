@@ -42,6 +42,20 @@ public class JServerGuildListener implements IncomingDataListener {
                 return;
             }
 
+            if (subChannel.equalsIgnoreCase("guild_info_guild")) {
+                UUID actor = UUID.fromString(in.readUTF());
+                String guildArg = in.readUTF();
+                GuildManager.showGuildInformation(actor, guildArg);
+                return;
+            }
+
+            if (subChannel.equalsIgnoreCase("guild_info_guild_members")) {
+                UUID actor = UUID.fromString(in.readUTF());
+                String guildArg = in.readUTF();
+                GuildManager.showGuildMembers(actor, guildArg);
+                return;
+            }
+
 
         } catch (IOException e1) {
             e1.printStackTrace();

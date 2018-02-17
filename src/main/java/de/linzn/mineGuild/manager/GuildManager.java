@@ -18,6 +18,7 @@ import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
+import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -41,7 +42,7 @@ public class GuildManager {
             return;
         }
 
-        if (create_guild(guildName, creator)) {
+        if (create_guild(guildName, player)) {
             player.sendMessage("Gilde wurde erstellt!");
         }
     }
@@ -69,56 +70,115 @@ public class GuildManager {
         }
     }
 
+    public static void showGuildInformation(UUID actor, String guildArg) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        Guild guild;
+        if (guildArg.equalsIgnoreCase("null")) {
+            GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+            if (guildPlayer == null) {
+                player.sendMessage("Du bist in keiner Gilde!");
+                return;
+            }
+            guild = guildPlayer.getGuild();
+        } else {
+            guild = GuildDatabase.getGuild(guildArg);
+            if (guild == null) {
+                player.sendMessage("Diese Gilde gibt es nicht");
+                return;
+            }
+        }
+        /* Now show information */
+        int size = guild.guildPlayers.size();
+        int guildLevel = guild.guildLevel;
+        double guildExperience = guild.guildExperience;
+        double requiredGuildExperience = guild.getGuildRequiredExperience();
+
+        player.sendMessage("Guild: " + guild.guildName);
+        player.sendMessage("Mitglieder: " + size);
+        player.sendMessage("Level: " + guildLevel);
+        player.sendMessage("EXP: " + guildExperience + "/" + requiredGuildExperience);
+    }
+
+    public static void showGuildMembers(UUID actor, String guildArg) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        Guild guild;
+        if (guildArg.equalsIgnoreCase("null")) {
+            GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+            if (guildPlayer == null) {
+                player.sendMessage("Du bist in keiner Gilde!");
+                return;
+            }
+            guild = guildPlayer.getGuild();
+        } else {
+            guild = GuildDatabase.getGuild(guildArg);
+            if (guild == null) {
+                player.sendMessage("Diese Gilde gibt es nicht");
+                return;
+            }
+        }
+        /* Now show information */
+        HashSet<GuildPlayer> guildMembers = guild.guildPlayers;
+
+        player.sendMessage("Guild Mitglieder: ");
+        for (GuildPlayer guildPlayer : guildMembers) {
+            String name = BungeeQuery.getPlayerName(guildPlayer.getUUID());
+            player.sendMessage(name + "::" + guildPlayer.getGuildRang().rangName);
+        }
+    }
+
 
     /* ##########################
      * Private guild functions
       ##########################*/
 
-    private static boolean create_guild(String guildName, UUID creator) {
+    private static boolean create_guild(String guildName, ProxiedPlayer creator) {
         UUID guildUUID = UUID.randomUUID();
-        Guild tempGuild = new Guild(guildName, guildUUID);
+        Guild guild = new Guild(guildName, guildUUID);
 
         /* Set default rang */
         GuildRang masterRang = getDefaultRang("static_master");
-        tempGuild.setGuildRang(masterRang);
+        guild.setGuildRang(masterRang);
         GuildRang assistantRang = getDefaultRang("assistant");
-        tempGuild.setGuildRang(assistantRang);
+        guild.setGuildRang(assistantRang);
         GuildRang memberRang = getDefaultRang("static_member");
-        tempGuild.setGuildRang(memberRang);
+        guild.setGuildRang(memberRang);
 
         /* Set master */
-        GuildPlayer owner = new GuildPlayer(creator);
-        owner.setGuild(tempGuild);
+        GuildPlayer owner = new GuildPlayer(creator.getUniqueId());
+        owner.setGuild(guild);
         owner.setRangUUID(masterRang.rangUUID);
-        tempGuild.setGuildPlayer(owner);
-
-        /* Add guild to mysql */
-        if (!GuildQuery.setGuild(tempGuild)) {
-            MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
-            return false;
-        }
-
-        /* Load real guild from database */
-        Guild guild = GuildQuery.getGuild(guildUUID);
+        guild.setGuildPlayer(owner);
         GuildDatabase.addGuild(guild);
+
+        /* Add guild async to mysql */
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            if (!GuildQuery.setGuild(guild)) {
+                creator.sendMessage("Error in Database save!");
+                MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
+            }
+        });
+
         // todo send socket msg
         return true;
     }
 
-    private static boolean remove_guild(UUID guildUUID, UUID creator) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
+    private static boolean remove_guild(UUID guildUUID, UUID actor) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         if (player == null) {
             return false;
         }
         Guild guild = GuildDatabase.getGuild(guildUUID);
 
-        /* remove guild from database */
-        if (!GuildQuery.unsetGuild(guild.guildUUID)) {
-            MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
-            return false;
-        }
         /* remove loaded guild */
         GuildDatabase.removeGuild(guild.guildUUID);
+
+        /* Remove guild async from mysql */
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            if (!GuildQuery.unsetGuild(guild.guildUUID)) {
+                MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
+                player.sendMessage("Error in Database save!");
+            }
+        });
         // todo send socket msg
         return true;
     }
