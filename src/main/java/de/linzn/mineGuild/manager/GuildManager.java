@@ -27,6 +27,18 @@ import java.util.UUID;
 
 public class GuildManager {
 
+    public static void processInvitation(UUID actor, String invitedPlayer) {
+
+    }
+
+    public static void acceptInvitation(UUID actor) {
+
+    }
+
+    public static void denyInvitation(UUID actor) {
+
+    }
+
     public static void establishGuild(String guildName, UUID creator) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
         if (player == null) {
