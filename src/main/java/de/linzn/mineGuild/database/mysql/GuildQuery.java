@@ -27,6 +27,49 @@ import java.util.UUID;
 
 public class GuildQuery {
 
+    public static boolean addGuildPlayer(GuildPlayer guildPlayer) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        Guild guild = guildPlayer.getGuild();
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement insert = conn.prepareStatement("SELECT player_uuid FROM guild_entities WHERE player_uuid = '" + guildPlayer.getUUID() + "';");
+            ResultSet result = insert.executeQuery();
+            if (result.next()) {
+                insert = conn
+                        .prepareStatement("UPDATE guild_entities SET guild_uuid = '" + guild.guildUUID.toString() + "', guild_rang = '" + guildPlayer.getGuildRang().rangUUID.toString() + "' WHERE player_uuid = '" + guildPlayer.getUUID() + "';");
+            } else {
+                insert = conn
+                        .prepareStatement("INSERT INTO guild_entities (player_uuid, guild_uuid, guild_rang) VALUES ('"
+                                + guildPlayer.getUUID() + "', '" + guild.guildUUID + "', '" + guildPlayer.getGuildRang().rangUUID.toString() + "');");
+            }
+            insert.executeUpdate();
+            insert.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
+    public static boolean removeGuildPlayer(UUID playerUUID) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement update1 = conn.prepareStatement(
+                    "DELETE FROM guild_entities WHERE player_uuid = '" + playerUUID + "';");
+            update1.executeUpdate();
+            update1.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
     public static boolean setGuild(Guild guild) {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         boolean success = false;

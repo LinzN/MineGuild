@@ -24,18 +24,85 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class GuildManager {
 
     public static void processInvitation(UUID actor, String invitedPlayer) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+        if (guildPlayer == null) {
+            actorP.sendMessage("Du bist in keiner Gilde!");
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+        if (!guild.hasPermission(guildPlayer, GuildPermission.INVITE)) {
+            actorP.sendMessage("Du hast dafür keine Berechtigung!");
+            return;
+        }
+        ProxiedPlayer invitedP = ProxyServer.getInstance().getPlayer(invitedPlayer);
+        if (invitedP == null) {
+            actorP.sendMessage("Dieser Spieler ist nicht online!");
+            return;
+        }
+        if (invitedP == actorP) {
+            actorP.sendMessage("Du kannst dich nicht selbst einladen!");
+            return;
+        }
+        if (GuildDatabase.getGuildPlayer(invitedP.getUniqueId()) != null) {
+            actorP.sendMessage("Der Spieler ist bereits in einer Gilde!");
+            return;
+        }
+        if (GuildDatabase.hasGuildInvitation(invitedP.getUniqueId())) {
+            actorP.sendMessage("Dieser Spieler hat bereits eine Einladung offen!");
+            return;
+        }
 
+        GuildDatabase.addGuildInvitation(invitedP.getUniqueId(), guild);
+        ProxyServer.getInstance().getScheduler().schedule(MineGuildPlugin.inst(), () -> {
+            if (GuildDatabase.hasGuildInvitation(invitedP.getUniqueId())) {
+                GuildDatabase.removeGuildInvitation(invitedP.getUniqueId());
+                invitedP.sendMessage("Die Einladung ist abgelaufen!");
+                if (actorP != null) {
+                    actorP.sendMessage("Deine Einladung ist abgelaufen ohne aktivität!");
+                }
+            }
+        }, 40, TimeUnit.SECONDS);
+
+        invitedP.sendMessage(actorP.getName() + " möchte dich in die Gilde " + guild.guildName + " aufnehmen. Gib /guild accept um anzunehmen oder /guild deny um abzulehnen ein.");
     }
 
     public static void acceptInvitation(UUID actor) {
-
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        if (player == null) {
+            return;
+        }
+        if (!GuildDatabase.hasGuildInvitation(actor)) {
+            player.sendMessage("Du hast keine Offenen Einladungen!");
+            return;
+        }
+        Guild guild = GuildDatabase.getGuild(GuildDatabase.getGuildInvitationGuildUUID(actor));
+        if (guild == null) {
+            player.sendMessage("Die Gilde gibt es nicht mehr!");
+            GuildDatabase.removeGuildInvitation(actor);
+            return;
+        }
+        GuildDatabase.removeGuildInvitation(actor);
+        player.sendMessage("Die Einladung wurde angenommen!");
+        add_player_to_guild(guild.guildUUID, actor);
     }
 
     public static void denyInvitation(UUID actor) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        if (player == null) {
+            return;
+        }
+        if (!GuildDatabase.hasGuildInvitation(actor)) {
+            player.sendMessage("Du hast keine Offenen Einladungen!");
+            return;
+        }
+        GuildDatabase.removeGuildInvitation(actor);
+        player.sendMessage("Du hast die Einladungen abgelehnt!");
 
     }
 
@@ -207,9 +274,10 @@ public class GuildManager {
         }
         GuildPlayer guildPlayer = new GuildPlayer(invitedPlayer.getUniqueId());
         guildPlayer.setRangUUID(guild.getGuildRang("static_member").rangUUID);
-        // todo add to database mysql
         guildPlayer.setGuild(guild);
         guild.setGuildPlayer(guildPlayer);
+
+        GuildQuery.addGuildPlayer(guildPlayer);
         // todo send socket msg
     }
 
@@ -224,7 +292,7 @@ public class GuildManager {
         }
         guildPlayer.setGuild(null);
         guild.unsetGuildPlayer(guildPlayer);
-        // remove database player
+        GuildQuery.removeGuildPlayer(removedUUID);
         // todo send socket msg
     }
 

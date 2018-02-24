@@ -23,6 +23,7 @@ import java.util.UUID;
 
 public class GuildDatabase {
     private static HashMap<UUID, Guild> guilds = new HashMap<>();
+    private static HashMap<UUID, UUID> pendingInvites = new HashMap<>();
 
     public static GuildPlayer getGuildPlayer(String playerName) {
         UUID playerUUID = null;
@@ -84,5 +85,20 @@ public class GuildDatabase {
         guilds.remove(uuid);
     }
 
+    public static boolean hasGuildInvitation(UUID playerUUID) {
+        return pendingInvites.containsKey(playerUUID);
+    }
+
+    public static UUID getGuildInvitationGuildUUID(UUID playerUUID) {
+        return pendingInvites.get(playerUUID);
+    }
+
+    public static void addGuildInvitation(UUID playerUUID, Guild guild) {
+        pendingInvites.put(playerUUID, guild.guildUUID);
+    }
+
+    public static void removeGuildInvitation(UUID playerUUID) {
+        pendingInvites.remove(playerUUID);
+    }
 
 }

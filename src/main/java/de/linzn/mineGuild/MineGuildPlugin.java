@@ -12,6 +12,7 @@
 package de.linzn.mineGuild;
 
 
+import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
 import de.linzn.mineGuild.socket.JServerGuildListener;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
@@ -32,5 +33,6 @@ public class MineGuildPlugin extends Plugin {
         inst = this;
         GuildManager.loadData();
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild", new JServerGuildListener());
+        this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
     }
 }
