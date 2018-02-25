@@ -101,4 +101,5 @@ public class GuildDatabase {
         pendingInvites.remove(playerUUID);
     }
 
+
 }

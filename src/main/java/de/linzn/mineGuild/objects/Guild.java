@@ -12,6 +12,9 @@
 package de.linzn.mineGuild.objects;
 
 
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -99,5 +102,14 @@ public class Guild {
         this.guildLevel = level;
     }
 
+
+    public void broadcastInGuild(String text) {
+        for (GuildPlayer guildPlayer : this.guildPlayers) {
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(guildPlayer.getUUID());
+            if (player != null) {
+                player.sendMessage(text);
+            }
+        }
+    }
 
 }

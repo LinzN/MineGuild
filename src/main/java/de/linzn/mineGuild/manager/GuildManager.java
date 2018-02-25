@@ -18,7 +18,9 @@ import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
+import de.linzn.mineGuild.utils.LanguageDB;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
+import de.linzn.mineSuite.bungee.module.chat.ChatManager;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -32,29 +34,29 @@ public class GuildManager {
         ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
         GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
         if (guildPlayer == null) {
-            actorP.sendMessage("Du bist in keiner Gilde!");
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
             return;
         }
         Guild guild = guildPlayer.getGuild();
         if (!guild.hasPermission(guildPlayer, GuildPermission.INVITE)) {
-            actorP.sendMessage("Du hast dafür keine Berechtigung!");
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
             return;
         }
         ProxiedPlayer invitedP = ProxyServer.getInstance().getPlayer(invitedPlayer);
         if (invitedP == null) {
-            actorP.sendMessage("Dieser Spieler ist nicht online!");
+            actorP.sendMessage(LanguageDB.player_not_online);
             return;
         }
         if (invitedP == actorP) {
-            actorP.sendMessage("Du kannst dich nicht selbst einladen!");
+            actorP.sendMessage(LanguageDB.you_not_invite_self);
             return;
         }
         if (GuildDatabase.getGuildPlayer(invitedP.getUniqueId()) != null) {
-            actorP.sendMessage("Der Spieler ist bereits in einer Gilde!");
+            actorP.sendMessage(LanguageDB.player_already_in_guild);
             return;
         }
         if (GuildDatabase.hasGuildInvitation(invitedP.getUniqueId())) {
-            actorP.sendMessage("Dieser Spieler hat bereits eine Einladung offen!");
+            actorP.sendMessage(LanguageDB.player_has_already_invitation);
             return;
         }
 
@@ -62,14 +64,16 @@ public class GuildManager {
         ProxyServer.getInstance().getScheduler().schedule(MineGuildPlugin.inst(), () -> {
             if (GuildDatabase.hasGuildInvitation(invitedP.getUniqueId())) {
                 GuildDatabase.removeGuildInvitation(invitedP.getUniqueId());
-                invitedP.sendMessage("Die Einladung ist abgelaufen!");
+                invitedP.sendMessage(LanguageDB.guild_invitation_expired);
                 if (actorP != null) {
-                    actorP.sendMessage("Deine Einladung ist abgelaufen ohne aktivität!");
+                    actorP.sendMessage(LanguageDB.your_guild_invitation_expired);
                 }
             }
         }, 40, TimeUnit.SECONDS);
 
-        invitedP.sendMessage(actorP.getName() + " möchte dich in die Gilde " + guild.guildName + " aufnehmen. Gib /guild accept um anzunehmen oder /guild deny um abzulehnen ein.");
+        guild.broadcastInGuild(LanguageDB.guild_get_guild_invitation.replace("{player}", invitedP.getName()));
+
+        invitedP.sendMessage(LanguageDB.you_get_guild_invitation.replace("{actor}", actorP.getName()).replace("{guild}", guild.guildName));
     }
 
     public static void acceptInvitation(UUID actor) {
@@ -78,18 +82,19 @@ public class GuildManager {
             return;
         }
         if (!GuildDatabase.hasGuildInvitation(actor)) {
-            player.sendMessage("Du hast keine Offenen Einladungen!");
+            player.sendMessage(LanguageDB.you_no_open_invitations);
             return;
         }
         Guild guild = GuildDatabase.getGuild(GuildDatabase.getGuildInvitationGuildUUID(actor));
         if (guild == null) {
-            player.sendMessage("Die Gilde gibt es nicht mehr!");
+            player.sendMessage(LanguageDB.guild_not_exist);
             GuildDatabase.removeGuildInvitation(actor);
             return;
         }
         GuildDatabase.removeGuildInvitation(actor);
-        player.sendMessage("Die Einladung wurde angenommen!");
+        player.sendMessage(LanguageDB.you_accept_invitation);
         add_player_to_guild(guild.guildUUID, actor);
+        guild.broadcastInGuild(LanguageDB.guild_new_member.replace("{player}", player.getName()));
     }
 
     public static void denyInvitation(UUID actor) {
@@ -98,11 +103,11 @@ public class GuildManager {
             return;
         }
         if (!GuildDatabase.hasGuildInvitation(actor)) {
-            player.sendMessage("Du hast keine Offenen Einladungen!");
+            player.sendMessage(LanguageDB.you_no_open_invitations);
             return;
         }
         GuildDatabase.removeGuildInvitation(actor);
-        player.sendMessage("Du hast die Einladungen abgelehnt!");
+        player.sendMessage(LanguageDB.you_deny_invitation);
 
     }
 
@@ -112,17 +117,18 @@ public class GuildManager {
             return;
         }
         if (GuildDatabase.getGuildPlayer(creator) != null) {
-            player.sendMessage("Du bist bereits in einer Gilde!");
+            player.sendMessage(LanguageDB.you_already_in_guild);
             return;
         }
 
         if (GuildDatabase.isGuild(guildName)) {
-            player.sendMessage("Diese Gilde gibt es bereits");
+            player.sendMessage(LanguageDB.guild_already_exist);
             return;
         }
 
         if (create_guild(guildName, player)) {
-            player.sendMessage("Gilde wurde erstellt!");
+            player.sendMessage(LanguageDB.you_create_guild.replace("{guild}", guildName));
+            broadcastGlobal(LanguageDB.guild_create_guild.replace("{guild}", guildName).replace("{player}", player.getName()));
         }
     }
 
@@ -133,19 +139,22 @@ public class GuildManager {
         }
         GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
         if (guildPlayer == null) {
-            player.sendMessage("Du bist in keiner Gilde!");
+            player.sendMessage(LanguageDB.you_not_in_guild);
             return;
         }
 
         Guild guild = guildPlayer.getGuild();
+        String guildName = guild.guildName;
 
         if (!guild.hasPermission(guildPlayer, GuildPermission.DELETE)) {
-            player.sendMessage("Du hast dazu keine Berechtigung!");
+            player.sendMessage(LanguageDB.you_no_guild_perm);
             return;
         }
 
         if (remove_guild(guildPlayer.getGuild().guildUUID, actor)) {
-            player.sendMessage("Gilde wurde aufgelöst!");
+            player.sendMessage(LanguageDB.you_remove_guild.replace("{guild}", guildName));
+            guild.broadcastInGuild(LanguageDB.guild_remove_guild_members);
+            broadcastGlobal(LanguageDB.guild_remove_guild.replace("{guild}", guildName).replace("{player}", player.getName()));
         }
     }
 
@@ -155,14 +164,14 @@ public class GuildManager {
         if (guildArg.equalsIgnoreCase("null")) {
             GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
             if (guildPlayer == null) {
-                player.sendMessage("Du bist in keiner Gilde!");
+                player.sendMessage(LanguageDB.you_not_in_guild);
                 return;
             }
             guild = guildPlayer.getGuild();
         } else {
             guild = GuildDatabase.getGuild(guildArg);
             if (guild == null) {
-                player.sendMessage("Diese Gilde gibt es nicht");
+                player.sendMessage(LanguageDB.guild_not_exist);
                 return;
             }
         }
@@ -172,10 +181,11 @@ public class GuildManager {
         double guildExperience = guild.guildExperience;
         double requiredGuildExperience = guild.getGuildRequiredExperience();
 
-        player.sendMessage("Guild: " + guild.guildName);
-        player.sendMessage("Mitglieder: " + size);
-        player.sendMessage("Level: " + guildLevel);
-        player.sendMessage("EXP: " + guildExperience + "/" + requiredGuildExperience);
+        player.sendMessage(LanguageDB.interface_guildinfo_header);
+        player.sendMessage(LanguageDB.interface_guildinfo_name.replace("{guild}", guild.guildName));
+        player.sendMessage(LanguageDB.interface_guildinfo_membersize.replace("{guild_size}", "" + size));
+        player.sendMessage(LanguageDB.interface_guildinfo_guildlevel.replace("{guild_level}", "" + guildLevel));
+        player.sendMessage(LanguageDB.interface_guildinfo_guildexperience.replace("{exp}", "" + guildExperience).replace("{totalExp}", "" + requiredGuildExperience));
     }
 
     public static void showGuildMembers(UUID actor, String guildArg) {
@@ -184,24 +194,24 @@ public class GuildManager {
         if (guildArg.equalsIgnoreCase("null")) {
             GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
             if (guildPlayer == null) {
-                player.sendMessage("Du bist in keiner Gilde!");
+                player.sendMessage(LanguageDB.you_not_in_guild);
                 return;
             }
             guild = guildPlayer.getGuild();
         } else {
             guild = GuildDatabase.getGuild(guildArg);
             if (guild == null) {
-                player.sendMessage("Diese Gilde gibt es nicht");
+                player.sendMessage(LanguageDB.guild_not_exist);
                 return;
             }
         }
         /* Now show information */
         HashSet<GuildPlayer> guildMembers = guild.guildPlayers;
 
-        player.sendMessage("Guild Mitglieder: ");
+        player.sendMessage(LanguageDB.interface_guildmembers_header);
         for (GuildPlayer guildPlayer : guildMembers) {
             String name = BungeeQuery.getPlayerName(guildPlayer.getUUID());
-            player.sendMessage(name + "::" + guildPlayer.getGuildRang().rangName);
+            player.sendMessage(LanguageDB.interface_guildmembers_entry.replace("{player}", name).replace("{rang}", guildPlayer.getGuildRang().rangName));
         }
     }
 
@@ -232,7 +242,7 @@ public class GuildManager {
         /* Add guild async to mysql */
         ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
             if (!GuildQuery.setGuild(guild)) {
-                creator.sendMessage("Error in Database save!");
+                creator.sendMessage(LanguageDB.database_error);
                 MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
             }
         });
@@ -255,7 +265,7 @@ public class GuildManager {
         ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
             if (!GuildQuery.unsetGuild(guild.guildUUID)) {
                 MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
-                player.sendMessage("Error in Database save!");
+                player.sendMessage(LanguageDB.database_error);
             }
         });
         // todo send socket msg
@@ -325,5 +335,9 @@ public class GuildManager {
             rang.setPermission(GuildPermission.INFO);
         }
         return rang;
+    }
+
+    public static void broadcastGlobal(String text) {
+        ChatManager.broadcastChat(text);
     }
 }
