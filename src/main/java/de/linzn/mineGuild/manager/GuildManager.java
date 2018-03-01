@@ -30,6 +30,35 @@ import java.util.concurrent.TimeUnit;
 
 public class GuildManager {
 
+    /* Public player leave guild from ioStream */
+    public static void playerLeave(UUID actor) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.LEAVE)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        if (guildPlayer.getGuildRang().rangName.equalsIgnoreCase("static_master")) {
+            actorP.sendMessage(LanguageDB.you_can_not_leave_guild);
+            return;
+        }
+
+        if (remove_player_from_guild(guild.guildUUID, guildPlayer.getUUID())) {
+            guild.broadcastInGuild(LanguageDB.guild_player_leave.replace("{player}", actorP.getName()));
+            actorP.sendMessage(LanguageDB.you_guild_leave);
+        }
+
+    }
+
+    /* Public guild invitation from ioStream */
     public static void processInvitation(UUID actor, String invitedPlayer) {
         ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
         GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
@@ -48,7 +77,7 @@ public class GuildManager {
             return;
         }
         if (invitedP == actorP) {
-            actorP.sendMessage(LanguageDB.you_not_invite_self);
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
             return;
         }
         if (GuildDatabase.getGuildPlayer(invitedP.getUniqueId()) != null) {
@@ -76,6 +105,44 @@ public class GuildManager {
         invitedP.sendMessage(LanguageDB.you_get_guild_invitation.replace("{actor}", actorP.getName()).replace("{guild}", guild.guildName));
     }
 
+    /* Public guild kick from ioStream */
+    public static void processKick(UUID actor, String kickedPlayer) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+        if (!guild.hasPermission(guildPlayer, GuildPermission.KICK)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+        GuildPlayer kickedGuildPlayer = GuildDatabase.getGuildPlayer(kickedPlayer);
+
+        if (kickedGuildPlayer == null) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+        if (kickedGuildPlayer.getGuild() != guild) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
+        if (kickedGuildPlayer == guildPlayer) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+        if (remove_player_from_guild(guild.guildUUID, kickedGuildPlayer.getUUID())) {
+            guild.broadcastInGuild(LanguageDB.guild_kicked_player.replace("{actor}", actorP.getName()).replace("{player}", BungeeQuery.getPlayerName(kickedGuildPlayer.getUUID())));
+            if (ProxyServer.getInstance().getPlayer(kickedPlayer) != null) {
+                ProxyServer.getInstance().getPlayer(kickedPlayer).sendMessage(LanguageDB.you_kicked_from_guild.replace("{actor}", actorP.getName()));
+            }
+        }
+
+    }
+
+    /* Public guild accept invitation from ioStream */
     public static void acceptInvitation(UUID actor) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         if (player == null) {
@@ -93,10 +160,12 @@ public class GuildManager {
         }
         GuildDatabase.removeGuildInvitation(actor);
         player.sendMessage(LanguageDB.you_accept_invitation);
-        add_player_to_guild(guild.guildUUID, actor);
-        guild.broadcastInGuild(LanguageDB.guild_new_member.replace("{player}", player.getName()));
+        if (add_player_to_guild(guild.guildUUID, actor)) {
+            guild.broadcastInGuild(LanguageDB.guild_new_member.replace("{player}", player.getName()));
+        }
     }
 
+    /* Public guild deny invitation from ioStream */
     public static void denyInvitation(UUID actor) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         if (player == null) {
@@ -111,6 +180,7 @@ public class GuildManager {
 
     }
 
+    /* Public new guild from ioStream */
     public static void establishGuild(String guildName, UUID creator) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(creator);
         if (player == null) {
@@ -132,6 +202,7 @@ public class GuildManager {
         }
     }
 
+    /* Public disband guild from ioStream */
     public static void disbandGuild(UUID actor) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         if (player == null) {
@@ -158,6 +229,7 @@ public class GuildManager {
         }
     }
 
+    /* Public show guild info from ioStream */
     public static void showGuildInformation(UUID actor, String guildArg) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         Guild guild;
@@ -188,6 +260,7 @@ public class GuildManager {
         player.sendMessage(LanguageDB.interface_guildinfo_guildexperience.replace("{exp}", "" + guildExperience).replace("{totalExp}", "" + requiredGuildExperience));
     }
 
+    /* Public show members of guild from ioStream */
     public static void showGuildMembers(UUID actor, String guildArg) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         Guild guild;
@@ -272,38 +345,55 @@ public class GuildManager {
         return true;
     }
 
-    private static void add_player_to_guild(UUID guildUUID, UUID invitedUUID) {
+    private static boolean add_player_to_guild(UUID guildUUID, UUID invitedUUID) {
         ProxiedPlayer invitedPlayer = ProxyServer.getInstance().getPlayer(invitedUUID);
         if (invitedPlayer == null) {
             //not online
-            return;
+            return false;
         }
         Guild guild = GuildDatabase.getGuild(guildUUID);
         if (guild == null) {
-            return;
+            return false;
         }
         GuildPlayer guildPlayer = new GuildPlayer(invitedPlayer.getUniqueId());
         guildPlayer.setRangUUID(guild.getGuildRang("static_member").rangUUID);
         guildPlayer.setGuild(guild);
         guild.setGuildPlayer(guildPlayer);
 
-        GuildQuery.addGuildPlayer(guildPlayer);
+        /* Guild async from mysql */
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            if (!GuildQuery.addGuildPlayer(guildPlayer)) {
+                MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
+                invitedPlayer.sendMessage(LanguageDB.database_error);
+            }
+        });
         // todo send socket msg
+        return true;
     }
 
-    private static void remove_player_from_guild(UUID guildUUID, UUID removedUUID) {
+    private static boolean remove_player_from_guild(UUID guildUUID, UUID removedUUID) {
         Guild guild = GuildDatabase.getGuild(guildUUID);
         if (guild == null) {
-            return;
+            return false;
         }
         GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(removedUUID);
         if (guildPlayer == null) {
-            return;
+            return false;
         }
         guildPlayer.setGuild(null);
         guild.unsetGuildPlayer(guildPlayer);
-        GuildQuery.removeGuildPlayer(removedUUID);
+        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(removedUUID);
+        /* Guild async from mysql */
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            if (!GuildQuery.removeGuildPlayer(removedUUID)) {
+                MineGuildPlugin.inst().getLogger().severe("Error in Database save!");
+                if (proxiedPlayer != null) {
+                    proxiedPlayer.sendMessage(LanguageDB.database_error);
+                }
+            }
+        });
         // todo send socket msg
+        return true;
     }
 
     /* Load data to plugin */

@@ -11,6 +11,8 @@
 
 package de.linzn.mineGuild.socket;
 
+import de.linzn.mineGuild.objects.Guild;
+import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 
 import java.io.ByteArrayOutputStream;
@@ -19,17 +21,21 @@ import java.io.IOException;
 
 public class JServerGuildOutput {
 
-    public static void deletePlayerFromGuild(String pname, String uuid)
+    public static void sendGuildData(Guild guild)
 
     {
-
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
         try {
-            dataOutputStream.writeUTF("DeleteGuildFromPlayer");
-            dataOutputStream.writeUTF(pname);
-            dataOutputStream.writeUTF(uuid);
+            dataOutputStream.writeUTF("guild_update_data");
+            dataOutputStream.writeUTF(guild.guildUUID.toString());
+            dataOutputStream.writeUTF(guild.guildName);
+            dataOutputStream.writeInt(guild.guildLevel);
+            dataOutputStream.writeInt(guild.guildPlayers.size());
+            for (GuildPlayer guildPlayer : guild.guildPlayers) {
+                dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
