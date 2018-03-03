@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum GuildPermission {
+    MASTERKEY("GUILD::MASTERKEY"),
     DELETE("GUILD::DELETE"),
     DEPOSIT("GUILD::DEPOSIT"),
     WITHDRAW("GUILD::WITHDRAW"),

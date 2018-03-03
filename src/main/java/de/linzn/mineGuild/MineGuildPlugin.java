@@ -14,7 +14,10 @@ package de.linzn.mineGuild;
 
 import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
-import de.linzn.mineGuild.socket.JServerGuildListener;
+import de.linzn.mineGuild.socket.JServerGuildDefaultListener;
+import de.linzn.mineGuild.socket.JServerGuildEditListener;
+import de.linzn.mineGuild.socket.JServerGuildRangListener;
+import de.linzn.mineGuild.socket.JServerGuildUpdateListener;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -32,7 +35,10 @@ public class MineGuildPlugin extends Plugin {
     public void onEnable() {
         inst = this;
         GuildManager.loadData();
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild", new JServerGuildListener());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_default", new JServerGuildDefaultListener());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_edit", new JServerGuildEditListener());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_rang", new JServerGuildRangListener());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_update", new JServerGuildUpdateListener());
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
     }
 }

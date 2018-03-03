@@ -26,7 +26,11 @@ public class GuildRang {
     }
 
     public boolean hasPermission(GuildPermission permission) {
-        return this.permissions.contains(permission);
+        if (this.permissions.contains(GuildPermission.MASTERKEY)) {
+            return true;
+        } else {
+            return this.permissions.contains(permission);
+        }
     }
 
     public void setPermission(GuildPermission permission) {

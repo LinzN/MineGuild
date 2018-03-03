@@ -133,6 +133,12 @@ public class GuildManager {
             actorP.sendMessage(LanguageDB.player_action_not_possible);
             return;
         }
+
+        if (kickedGuildPlayer.getGuildRang().rangName.equalsIgnoreCase("static_master")) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
         if (remove_player_from_guild(guild.guildUUID, kickedGuildPlayer.getUUID())) {
             guild.broadcastInGuild(LanguageDB.guild_kicked_player.replace("{actor}", actorP.getName()).replace("{player}", BungeeQuery.getPlayerName(kickedGuildPlayer.getUUID())));
             if (ProxyServer.getInstance().getPlayer(kickedPlayer) != null) {
@@ -410,9 +416,7 @@ public class GuildManager {
         GuildRang rang = null;
         if (rangName.equalsIgnoreCase("static_master")) {
             rang = new GuildRang("static_master", UUID.randomUUID());
-            for (GuildPermission guildPermission : GuildPermission.values()) {
-                rang.setPermission(guildPermission);
-            }
+            rang.setPermission(GuildPermission.MASTERKEY);
         } else if (rangName.equalsIgnoreCase("assistant")) {
             rang = new GuildRang("assistant", UUID.randomUUID());
             rang.setPermission(GuildPermission.INVITE);
@@ -423,6 +427,7 @@ public class GuildManager {
             rang.setPermission(GuildPermission.HOME);
             rang.setPermission(GuildPermission.HELP);
             rang.setPermission(GuildPermission.INFO);
+            rang.setPermission(GuildPermission.LEAVE);
         }
         return rang;
     }

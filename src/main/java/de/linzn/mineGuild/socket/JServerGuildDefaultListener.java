@@ -11,6 +11,7 @@
 
 package de.linzn.mineGuild.socket;
 
+
 import de.linzn.jSocket.core.IncomingDataListener;
 import de.linzn.mineGuild.manager.GuildManager;
 
@@ -19,7 +20,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-public class JServerGuildListener implements IncomingDataListener {
+public class JServerGuildDefaultListener implements IncomingDataListener {
 
 
     @Override
@@ -84,6 +85,18 @@ public class JServerGuildListener implements IncomingDataListener {
             if (subChannel.equalsIgnoreCase("guild_leave_from_guild")) {
                 UUID actor = UUID.fromString(in.readUTF());
                 GuildManager.playerLeave(actor);
+                return;
+            }
+            if (subChannel.equalsIgnoreCase("guild_send_spawn_guild")) {
+                UUID actor = UUID.fromString(in.readUTF());
+                // GuildManager.playerLeave(actor);
+                return;
+            }
+
+            if (subChannel.equalsIgnoreCase("guild_list_all_guild")) {
+                UUID actor = UUID.fromString(in.readUTF());
+                int page = in.readInt();
+                // GuildManager.playerLeave(actor);
                 return;
             }
 
