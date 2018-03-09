@@ -30,6 +30,29 @@ import java.util.concurrent.TimeUnit;
 
 public class GuildManager {
 
+    public static void showGuildList(UUID actor, int page) {
+
+    }
+
+    public static void playerGuildHome(UUID actor) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.HOME)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        //guild.guildhome...
+
+    }
+
     /* Public player leave guild from ioStream */
     public static void playerLeave(UUID actor) {
         ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
@@ -267,7 +290,7 @@ public class GuildManager {
     }
 
     /* Public show members of guild from ioStream */
-    public static void showGuildMembers(UUID actor, String guildArg) {
+    public static void showGuildMembers(UUID actor, String guildArg, int page) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
         Guild guild;
         if (guildArg.equalsIgnoreCase("null")) {

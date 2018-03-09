@@ -53,7 +53,8 @@ public class JServerGuildDefaultListener implements IncomingDataListener {
             if (subChannel.equalsIgnoreCase("guild_info_guild_members")) {
                 UUID actor = UUID.fromString(in.readUTF());
                 String guildArg = in.readUTF();
-                GuildManager.showGuildMembers(actor, guildArg);
+                int page = in.readInt();
+                GuildManager.showGuildMembers(actor, guildArg, page);
                 return;
             }
 
@@ -89,14 +90,14 @@ public class JServerGuildDefaultListener implements IncomingDataListener {
             }
             if (subChannel.equalsIgnoreCase("guild_send_spawn_guild")) {
                 UUID actor = UUID.fromString(in.readUTF());
-                // GuildManager.playerLeave(actor);
+                GuildManager.playerGuildHome(actor);
                 return;
             }
 
             if (subChannel.equalsIgnoreCase("guild_list_all_guild")) {
                 UUID actor = UUID.fromString(in.readUTF());
                 int page = in.readInt();
-                // GuildManager.playerLeave(actor);
+                GuildManager.showGuildList(actor, page);
                 return;
             }
 
