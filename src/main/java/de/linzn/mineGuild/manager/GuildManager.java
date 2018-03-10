@@ -24,14 +24,29 @@ import de.linzn.mineSuite.bungee.module.chat.ChatManager;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class GuildManager {
 
-    public static void showGuildList(UUID actor, int page) {
 
+    public static void showGuildList(UUID actor, int page) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        /* Now show information */
+        Collection<Guild> fullGuilds = GuildDatabase.getGuilds();
+
+        @SuppressWarnings("unchecked")
+        List<Guild> pageGuilds = (List<Guild>) createPageEntries(new ArrayList<>(fullGuilds), 10, page);
+        player.sendMessage(LanguageDB.interface_guildlist_header);
+        if (pageGuilds.isEmpty()) {
+            player.sendMessage(LanguageDB.no_entries_on_page);
+        }
+        for (Guild guild : pageGuilds) {
+            String guildName = guild.guildName;
+            int guildLevel = guild.guildLevel;
+            int memberSize = guild.guildPlayers.size();
+            player.sendMessage(LanguageDB.interface_guildlist_entry.replace("{guildName}", guildName).replace("{level}", "" + guildLevel).replace("{memberSize}", "" + memberSize));
+        }
     }
 
     public static void playerGuildHome(UUID actor) {
@@ -308,9 +323,13 @@ public class GuildManager {
             }
         }
         /* Now show information */
-        HashSet<GuildPlayer> guildMembers = guild.guildPlayers;
-
+        HashSet<GuildPlayer> fullMembers = guild.guildPlayers;
+        @SuppressWarnings("unchecked")
+        List<GuildPlayer> guildMembers = (List<GuildPlayer>) createPageEntries(new ArrayList<>(fullMembers), 10, page);
         player.sendMessage(LanguageDB.interface_guildmembers_header);
+        if (guildMembers.isEmpty()) {
+            player.sendMessage(LanguageDB.no_entries_on_page);
+        }
         for (GuildPlayer guildPlayer : guildMembers) {
             String name = BungeeQuery.getPlayerName(guildPlayer.getUUID());
             player.sendMessage(LanguageDB.interface_guildmembers_entry.replace("{player}", name).replace("{rang}", guildPlayer.getGuildRang().rangName));
@@ -453,6 +472,20 @@ public class GuildManager {
             rang.setPermission(GuildPermission.LEAVE);
         }
         return rang;
+    }
+
+    private static List<?> createPageEntries(List<?> fullObjects, int showMax, int number) {
+        int pageNumb;
+        if (number < 1) {
+            pageNumb = 0;
+        } else {
+            pageNumb = number - 1;
+        }
+        int count = fullObjects.size();
+        if (pageNumb * showMax > count) {
+            return new ArrayList<>();
+        }
+        return fullObjects.subList(pageNumb * showMax, pageNumb * showMax + showMax > count ? count : pageNumb * showMax + showMax);
     }
 
     public static void broadcastGlobal(String text) {

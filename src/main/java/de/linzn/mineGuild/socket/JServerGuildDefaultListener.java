@@ -100,6 +100,18 @@ public class JServerGuildDefaultListener implements IncomingDataListener {
                 GuildManager.showGuildList(actor, page);
                 return;
             }
+            if (subChannel.equalsIgnoreCase("guild_deposit_to_guild")) {
+                UUID actor = UUID.fromString(in.readUTF());
+                double amount = in.readDouble();
+                //GuildManager.showGuildList(actor, page);
+                return;
+            }
+            if (subChannel.equalsIgnoreCase("guild_withdraw_from_guild")) {
+                UUID actor = UUID.fromString(in.readUTF());
+                double amount = in.readDouble();
+                //GuildManager.showGuildList(actor, page);
+                return;
+            }
 
 
         } catch (IOException e1) {

@@ -22,6 +22,7 @@ public class LanguageDB {
     public static String your_guild_invitation_expired = ChatColor.YELLOW + "Deine Einladung ist abgelaufen ohne aktivität!";
     public static String you_get_guild_invitation = ChatColor.YELLOW + "{actor} " + ChatColor.GREEN + " möchte dich in die Gilde " + ChatColor.YELLOW + "{guild} " + ChatColor.GREEN + "aufnehmen.\n" + ChatColor.GREEN + "Gib " + ChatColor.YELLOW + "/guild accept " + ChatColor.GREEN + "um anzunehmen oder " + ChatColor.YELLOW + "/guild deny " + ChatColor.GREEN + "um abzulehnen ein.";
     public static String you_kicked_from_guild = ChatColor.YELLOW + "Du wurdest von {actor} aus der Gilde entfernt!";
+    public static String no_entries_on_page = ChatColor.RED + "Es wurden hier keine Einträge gefunden!";
 
     /* Guild broadcast */
     public static String guild_get_guild_invitation = ChatColor.GREEN + "Es wurde " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "in die Gilde eingeladen sich dieser anzuschliesen!";
@@ -48,4 +49,7 @@ public class LanguageDB {
 
     public static String interface_guildmembers_header = ChatColor.GOLD + "-===============[" + ChatColor.DARK_GREEN + "Gilden Mitglieder" + ChatColor.GOLD + "]===============-";
     public static String interface_guildmembers_entry = ChatColor.GREEN + "Spieler: " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + " Rang: " + ChatColor.YELLOW + "{rang}";
+
+    public static String interface_guildlist_header = ChatColor.GOLD + "-====================[" + ChatColor.DARK_GREEN + "Gilden" + ChatColor.GOLD + "]====================-";
+    public static String interface_guildlist_entry = ChatColor.GREEN + "Gilde: " + ChatColor.YELLOW + "{guildName} " + ChatColor.GREEN + " Mitglieder: " + ChatColor.YELLOW + "{memberSize} " + ChatColor.GREEN + " Level: " + ChatColor.YELLOW + "{level}";
 }
