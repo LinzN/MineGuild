@@ -9,7 +9,7 @@
  *
  */
 
-package de.linzn.mineGuild.socket;
+package de.linzn.mineGuild.socket.commandStream;
 
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class JServerGuildOutput {
+public class JServerGuildDefaultOutput {
 
     public static void sendGuildData(Guild guild)
 

@@ -12,6 +12,7 @@
 package de.linzn.mineGuild.objects;
 
 
+import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -25,6 +26,7 @@ public class Guild {
     public int guildLevel;
     public HashSet<GuildRang> guildRangs;
     public HashSet<GuildPlayer> guildPlayers;
+    public Location guildHome;
 
 
     public Guild(String guildName, UUID guildUUID) {
@@ -72,6 +74,10 @@ public class Guild {
 
     public boolean hasPermission(GuildPlayer guildPlayer, GuildPermission permission) {
         return guildPlayer.getGuildRang().hasPermission(permission);
+    }
+
+    public void setGuildHome(Location location) {
+        this.guildHome = location;
     }
 
 

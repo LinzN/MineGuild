@@ -14,6 +14,7 @@ public class LanguageDB {
     public static String player_has_already_invitation = ChatColor.DARK_RED + "Dieser Spieler hat noch eine Einladung offen!";
     public static String guild_already_exist = ChatColor.DARK_RED + "Diese Gilde gibt es bereits!";
     public static String guild_not_exist = ChatColor.DARK_RED + "Diese Gilde gibt es nicht!";
+    public static String guild_no_home = ChatColor.DARK_RED + "Die Gilde hat keinen Homepunkt gesetzt!";
     public static String you_can_not_leave_guild = ChatColor.DARK_RED + "Du kannst die Gilde so nicht verlassen. Bist du Gildenmeister?";
     public static String database_error = "" + ChatColor.DARK_RED + ChatColor.BOLD + "Es ist ein Datenbankfehler aufgetreten. Bitte an ein Teammitglied wenden!";
 

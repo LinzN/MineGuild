@@ -16,6 +16,7 @@ import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
 import de.linzn.mineSuite.bungee.database.mysql.setup.MySQLConnectionManager;
+import de.linzn.mineSuite.bungee.utils.Location;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -88,6 +89,9 @@ public class GuildQuery {
                 success = true;
                 private_set_guild_rangs(guild);
                 private_set_guild_players(guild);
+                if (guild.guildHome != null) {
+                    set_guild_home(guild.guildUUID, guild.guildHome);
+                }
             }
             result.close();
             sql.close();
@@ -173,6 +177,7 @@ public class GuildQuery {
         boolean success = false;
         private_unset_guild_rangs(guildUUID);
         private_unset_guild_players(guildUUID);
+        private_unset_guild_home(guildUUID);
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement update1 = conn.prepareStatement(
@@ -294,12 +299,16 @@ public class GuildQuery {
                     guild.setGuildRang(guildRang);
                 }
 
+                Location guildHome = private_get_guild_home(guildUUID);
+                guild.setGuildHome(guildHome);
+
                 ArrayList<GuildPlayer> guildPlayers = private_get_guild_players(guildUUID);
                 /* add to list */
                 for (GuildPlayer guildPlayer : guildPlayers) {
                     guildPlayer.setGuild(guild);
                     guild.setGuildPlayer(guildPlayer);
                 }
+
             }
             result.close();
             sql.close();
@@ -385,6 +394,74 @@ public class GuildQuery {
             e.printStackTrace();
         }
         return guildPlayers;
+    }
+
+    private static Location private_get_guild_home(UUID guildUUID) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        Location guildHome = null;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement sql = conn.prepareStatement(
+                    "SELECT * FROM guild_home WHERE guild_uuid = '" + guildUUID.toString() + "';");
+            ResultSet result = sql.executeQuery();
+            while (result.next()) {
+                String server = result.getString("server");
+                String world = result.getString("world");
+                double x = result.getDouble("x");
+                double y = result.getDouble("y");
+                double z = result.getDouble("z");
+                float yaw = result.getFloat("yaw");
+                float pitch = result.getFloat("pitch");
+                /* create location */
+                guildHome = new Location(server, world, x, y, z, yaw, pitch);
+            }
+            result.close();
+            sql.close();
+            manager.release("MineSuiteGuild", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return guildHome;
+    }
+
+    private static boolean private_unset_guild_home(UUID guildUUID) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement update1 = conn.prepareStatement(
+                    "DELETE FROM guild_home WHERE guild_uuid = '" + guildUUID.toString() + "';");
+            update1.executeUpdate();
+            update1.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
+    public static void set_guild_home(UUID guild_uuid, Location location) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement insert = null;
+            insert = conn.prepareStatement("SELECT guild_uuid FROM guild_home WHERE guild_uuid = '" + guild_uuid + "';");
+            ResultSet result = insert.executeQuery();
+            if (result.next()) {
+                insert = conn
+                        .prepareStatement("UPDATE guild_home SET server = '" + location.getServer() + "', world = '" + location.getWorld() + "', x = '" + location.getX() + "', y = '" + location.getY() + "', z = '" + location.getZ() + "', yaw = '" + location.getYaw() + "', pitch = '" + location.getPitch() + "' WHERE guild_uuid = '" + guild_uuid + "';");
+            } else {
+                insert = conn
+                        .prepareStatement("INSERT INTO guild_home (server, world, x, y z, yaw, pitch) VALUES ('" + location.getServer() + "', '" + location.getWorld() + "', '" + location.getX() + "', '" + location.getY() + "', '" + location.getZ() + "', '" + location.getYaw() + "', '" + location.getPitch() + "');");
+            }
+            insert.executeUpdate();
+
+            insert.close();
+            manager.release("MineSuiteGuild", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 

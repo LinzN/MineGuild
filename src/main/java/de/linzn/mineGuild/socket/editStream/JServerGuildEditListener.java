@@ -9,7 +9,7 @@
  *
  */
 
-package de.linzn.mineGuild.socket;
+package de.linzn.mineGuild.socket.editStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
@@ -19,7 +19,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-public class JServerGuildUpdateListener implements IncomingDataListener {
+public class JServerGuildEditListener implements IncomingDataListener {
 
 
     @Override

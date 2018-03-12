@@ -14,10 +14,10 @@ package de.linzn.mineGuild;
 
 import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
-import de.linzn.mineGuild.socket.JServerGuildDefaultListener;
-import de.linzn.mineGuild.socket.JServerGuildEditListener;
-import de.linzn.mineGuild.socket.JServerGuildRangListener;
-import de.linzn.mineGuild.socket.JServerGuildUpdateListener;
+import de.linzn.mineGuild.socket.commandStream.JServerGuildDefaultListener;
+import de.linzn.mineGuild.socket.editStream.JServerGuildEditListener;
+import de.linzn.mineGuild.socket.editStream.JServerGuildRangListener;
+import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateListener;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -30,9 +30,11 @@ public class MineGuildPlugin extends Plugin {
     }
 
     public void onDisable() {
+        this.getLogger().info("Disable MineGuild");
     }
 
     public void onEnable() {
+        this.getLogger().info("Enable MineGuild");
         inst = this;
         GuildManager.loadData();
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_default", new JServerGuildDefaultListener());

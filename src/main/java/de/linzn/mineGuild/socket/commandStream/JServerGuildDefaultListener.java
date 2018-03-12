@@ -9,7 +9,7 @@
  *
  */
 
-package de.linzn.mineGuild.socket;
+package de.linzn.mineGuild.socket.commandStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
@@ -29,7 +29,6 @@ public class JServerGuildDefaultListener implements IncomingDataListener {
         String subChannel;
         try {
             subChannel = in.readUTF();
-
             if (subChannel.equalsIgnoreCase("guild_create_guild")) {
                 String guildName = in.readUTF();
                 UUID creator = UUID.fromString(in.readUTF());
@@ -110,9 +109,7 @@ public class JServerGuildDefaultListener implements IncomingDataListener {
                 UUID actor = UUID.fromString(in.readUTF());
                 double amount = in.readDouble();
                 //GuildManager.showGuildList(actor, page);
-                return;
             }
-
 
         } catch (IOException e1) {
             e1.printStackTrace();

@@ -21,6 +21,8 @@ import de.linzn.mineGuild.objects.GuildRang;
 import de.linzn.mineGuild.utils.LanguageDB;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
+import de.linzn.mineSuite.bungee.module.teleport.TeleportManager;
+import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -64,8 +66,12 @@ public class GuildManager {
             return;
         }
 
-        //guild.guildhome...
-
+        Location guildHome = guild.guildHome;
+        if (guildHome == null) {
+            actorP.sendMessage(LanguageDB.guild_no_home);
+            return;
+        }
+        TeleportManager.teleportToLocation(actor, guildHome);
     }
 
     /* Public player leave guild from ioStream */
