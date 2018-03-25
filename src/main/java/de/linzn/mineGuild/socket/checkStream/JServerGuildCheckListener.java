@@ -9,18 +9,17 @@
  *
  */
 
-package de.linzn.mineGuild.socket.updateStream;
+package de.linzn.mineGuild.socket.checkStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
-import de.linzn.mineGuild.manager.InternalGuildManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-public class JServerGuildUpdateListener implements IncomingDataListener {
+public class JServerGuildCheckListener implements IncomingDataListener {
 
 
     @Override
@@ -30,9 +29,10 @@ public class JServerGuildUpdateListener implements IncomingDataListener {
         try {
             subChannel = in.readUTF();
 
-            if (subChannel.equalsIgnoreCase("request_all_guild_data")) {
-                String serverName = in.readUTF();
-                InternalGuildManager.server_data_request(serverName);
+            if (subChannel.equalsIgnoreCase("guild_check_deposit")) {
+
+                return;
+            } else if (subChannel.equalsIgnoreCase("guild_check_withdraw")) {
                 return;
             }
 
