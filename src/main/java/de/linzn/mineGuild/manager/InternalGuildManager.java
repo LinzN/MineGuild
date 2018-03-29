@@ -4,7 +4,7 @@ import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
-import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
+import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -24,7 +24,7 @@ public class InternalGuildManager {
         MineGuildPlugin.inst().getLogger().info("Request guild_data for server " + serverName);
         HashSet<Guild> guilds = new HashSet<>(GuildDatabase.getGuilds());
         for (Guild guild : guilds) {
-            JServerGuildUpdateOutput.set_guild_data(serverName, guild);
+            JServerGuildControlOutput.set_guild_data(serverName, guild);
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ignored) {
@@ -32,7 +32,7 @@ public class InternalGuildManager {
         }
         for (Guild guild : guilds) {
             for (GuildPlayer guildPlayer : guild.guildPlayers) {
-                JServerGuildUpdateOutput.set_guildplayer_data(serverName, guildPlayer);
+                JServerGuildControlOutput.set_guildplayer_data(serverName, guildPlayer);
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException ignored) {

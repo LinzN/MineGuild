@@ -15,6 +15,8 @@ package de.linzn.mineGuild;
 import de.linzn.jSocket.server.JServer;
 import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
+import de.linzn.mineGuild.socket.checkStream.JServerGuildCheckListener;
+import de.linzn.mineGuild.socket.checkStream.JServerGuildCheckOutput;
 import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandListener;
 import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandOutput;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlListener;
@@ -50,6 +52,7 @@ public class MineGuildPlugin extends Plugin {
         jServer.registerIncomingDataListener(JServerGuildRangOutput.headerChannel, new JServerGuildRangListener());
         jServer.registerIncomingDataListener(JServerGuildUpdateOutput.headerChannel, new JServerGuildUpdateListener());
         jServer.registerIncomingDataListener(JServerGuildControlOutput.headerChannel, new JServerGuildControlListener());
+        jServer.registerIncomingDataListener(JServerGuildCheckOutput.headerChannel, new JServerGuildCheckListener());
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
     }
 }
