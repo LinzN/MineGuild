@@ -14,10 +14,13 @@ package de.linzn.mineGuild.manager;
 import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.database.mysql.GuildQuery;
+import de.linzn.mineGuild.events.GuildCreateEvent;
+import de.linzn.mineGuild.events.GuildDisbandEvent;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
+import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineGuild.utils.LanguageDB;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
@@ -353,17 +356,17 @@ public class GuildManager {
 
         /* Set default rang */
         GuildRang masterRang = getDefaultRang("static_master");
-        guild.setGuildRang(masterRang);
+        guild.set_guild_rang(masterRang);
         GuildRang assistantRang = getDefaultRang("assistant");
-        guild.setGuildRang(assistantRang);
+        guild.set_guild_rang(assistantRang);
         GuildRang memberRang = getDefaultRang("static_member");
-        guild.setGuildRang(memberRang);
+        guild.set_guild_rang(memberRang);
 
         /* Set master */
         GuildPlayer owner = new GuildPlayer(creator.getUniqueId());
         owner.setGuild(guild);
         owner.setRangUUID(masterRang.rangUUID);
-        guild.setGuildPlayer(owner);
+        guild.addGuildPlayer(owner);
         GuildDatabase.addGuild(guild);
 
         /* Add guild async to mysql */
@@ -374,7 +377,11 @@ public class GuildManager {
             }
         });
 
-        // todo send socket msg
+        GuildCreateEvent gEvent = new GuildCreateEvent(guild, owner.getUUID());
+        MineGuildPlugin.inst().getProxy().getPluginManager().callEvent(gEvent);
+
+        JServerGuildUpdateOutput.add_guild(guild);
+        JServerGuildUpdateOutput.add_guildplayer(owner);
         return true;
     }
 
@@ -395,7 +402,11 @@ public class GuildManager {
                 player.sendMessage(LanguageDB.database_error);
             }
         });
-        // todo send socket msg
+
+        GuildDisbandEvent gEvent = new GuildDisbandEvent(guildUUID, actor);
+        MineGuildPlugin.inst().getProxy().getPluginManager().callEvent(gEvent);
+
+        JServerGuildUpdateOutput.remove_guild(guildUUID);
         return true;
     }
 
@@ -412,7 +423,7 @@ public class GuildManager {
         GuildPlayer guildPlayer = new GuildPlayer(invitedPlayer.getUniqueId());
         guildPlayer.setRangUUID(guild.getGuildRang("static_member").rangUUID);
         guildPlayer.setGuild(guild);
-        guild.setGuildPlayer(guildPlayer);
+        guild.addGuildPlayer(guildPlayer);
 
         /* Guild async from mysql */
         ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
@@ -421,7 +432,7 @@ public class GuildManager {
                 invitedPlayer.sendMessage(LanguageDB.database_error);
             }
         });
-        // todo send socket msg
+        JServerGuildUpdateOutput.add_guildplayer(guildPlayer);
         return true;
     }
 
@@ -435,7 +446,7 @@ public class GuildManager {
             return false;
         }
         guildPlayer.setGuild(null);
-        guild.unsetGuildPlayer(guildPlayer);
+        guild.removeGuildPlayer(guildPlayer);
         ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(removedUUID);
         /* Guild async from mysql */
         ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
@@ -446,7 +457,7 @@ public class GuildManager {
                 }
             }
         });
-        // todo send socket msg
+        JServerGuildUpdateOutput.remove_guildplayer(guildUUID, removedUUID);
         return true;
     }
 

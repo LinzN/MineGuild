@@ -12,9 +12,12 @@
 package de.linzn.mineGuild.objects;
 
 
+import de.linzn.mineGuild.MineGuildPlugin;
+import de.linzn.mineGuild.events.GuildLevelUpEvent;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Event;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -22,7 +25,7 @@ import java.util.UUID;
 public class Guild {
     public String guildName;
     public UUID guildUUID;
-    public long guildExperience;
+    public double guildExperience;
     public int guildLevel;
     public HashSet<GuildRang> guildRangs;
     public HashSet<GuildPlayer> guildPlayers;
@@ -38,20 +41,60 @@ public class Guild {
         this.guildPlayers = new HashSet<>();
     }
 
-    public void setGuildRang(GuildRang guildRang) {
+    /* Open initial value */
+    public void set_guild_name(String guildName) {
+        this.guildName = guildName;
+    }
+
+    public void set_total_exp(long exp) {
+        this.guildExperience = exp;
+    }
+
+    public void set_level(int level) {
+        this.guildLevel = level;
+    }
+
+    public void set_guild_home(Location location) {
+        this.guildHome = location;
+    }
+
+    public void set_guild_rang(GuildRang guildRang) {
         this.guildRangs.add(guildRang);
     }
 
-    public void unsetGuildRang(GuildRang guildRang) {
+    public void unset_guild_rang(GuildRang guildRang) {
         this.guildRangs.remove(guildRang);
     }
 
-    public void setGuildPlayer(GuildPlayer guildPlayer) {
+    /* Close initial value */
+
+    public void addGuildPlayer(GuildPlayer guildPlayer) {
         this.guildPlayers.add(guildPlayer);
     }
 
-    public void unsetGuildPlayer(GuildPlayer guildPlayer) {
+    public void removeGuildPlayer(GuildPlayer guildPlayer) {
         this.guildPlayers.remove(guildPlayer);
+    }
+
+    public void addExperience(double data) {
+        int maxLevel = 30;
+        if (this.guildExperience + data >= getGuildRequiredExperience()) {
+            double nextExp = this.guildExperience + data - getGuildRequiredExperience();
+            this.guildExperience = 0L;
+            this.guildLevel = this.guildLevel + 1;
+            /* Call levelup event */
+            GuildLevelUpEvent gEvent = new GuildLevelUpEvent(this, this.guildLevel);
+            MineGuildPlugin.inst().getProxy().getPluginManager().callEvent((Event) gEvent);
+
+            MineGuildPlugin.inst().getLogger().info("New Level UP Guild " + this.guildName);
+            if (this.guildLevel == maxLevel) {
+                this.guildExperience = 0L;
+                return;
+            }
+            addExperience(nextExp);
+        } else {
+            this.guildExperience = this.guildExperience + data;
+        }
     }
 
     public GuildRang getGuildRang(String rangName) {
@@ -76,12 +119,8 @@ public class Guild {
         return guildPlayer.getGuildRang().hasPermission(permission);
     }
 
-    public void setGuildHome(Location location) {
-        this.guildHome = location;
-    }
 
-
-    public long getGuildRequiredExperience() {
+    public double getGuildRequiredExperience() {
         long base = 1100;
         double multi;
         if (this.guildLevel <= 10) {
@@ -93,21 +132,8 @@ public class Guild {
         } else {
             multi = 1.94;
         }
-        return (base ^ this.guildLevel) * (long) (multi * this.guildLevel) * 100L;
+        return (base ^ this.guildLevel) * multi * this.guildLevel;
     }
-
-    public void setGuildName(String guildName) {
-        this.guildName = guildName;
-    }
-
-    public void setTotalExp(long exp) {
-        this.guildExperience = exp;
-    }
-
-    public void setLevel(int level) {
-        this.guildLevel = level;
-    }
-
 
     public void broadcastInGuild(String text) {
         for (GuildPlayer guildPlayer : this.guildPlayers) {

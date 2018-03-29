@@ -36,6 +36,13 @@ public class JServerGuildUpdateListener implements IncomingDataListener {
                 return;
             }
 
+            if (subChannel.equalsIgnoreCase("add_guild_exp")) {
+                UUID guildUUID = UUID.fromString(in.readUTF());
+                double data = in.readDouble();
+                InternalGuildManager.add_exp_to_guild(guildUUID, data);
+                return;
+            }
+
 
         } catch (IOException e1) {
             e1.printStackTrace();

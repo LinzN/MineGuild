@@ -7,8 +7,18 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 
 import java.util.HashSet;
+import java.util.UUID;
 
 public class InternalGuildManager {
+
+    public static void add_exp_to_guild(UUID guildUUID, double data) {
+        Guild guild = GuildDatabase.getGuild(guildUUID);
+        if (guild == null) {
+            return;
+        }
+        guild.addExperience(data);
+        //Todo Add Database save
+    }
 
     public static void server_data_request(String serverName) {
         MineGuildPlugin.inst().getLogger().info("Request guild_data for server " + serverName);

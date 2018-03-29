@@ -18,8 +18,96 @@ import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 public class JServerGuildUpdateOutput {
+
+    public static void add_guildplayer(GuildPlayer guildPlayer) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        try {
+            dataOutputStream.writeUTF("all");
+            dataOutputStream.writeUTF("guild_add_guildplayer");
+            dataOutputStream.writeUTF(guildPlayer.getGuild().guildUUID.toString());
+            dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+    }
+
+    public static void remove_guildplayer(UUID guildUUID, UUID playerUUID) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        try {
+            dataOutputStream.writeUTF("all");
+            dataOutputStream.writeUTF("guild_remove_guildplayer");
+            dataOutputStream.writeUTF(guildUUID.toString());
+            dataOutputStream.writeUTF(playerUUID.toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+    }
+
+    public static void add_guild(Guild guild) {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        try {
+            dataOutputStream.writeUTF("all");
+            dataOutputStream.writeUTF("guild_add_guild");
+            dataOutputStream.writeUTF(guild.guildUUID.toString());
+            dataOutputStream.writeUTF(guild.guildName);
+            dataOutputStream.writeInt(guild.guildLevel);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+
+    }
+
+    public static void remove_guild(UUID guildUUID) {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        try {
+            dataOutputStream.writeUTF("all");
+            dataOutputStream.writeUTF("guild_remove_guild");
+            dataOutputStream.writeUTF(guildUUID.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+
+    }
+
+    public static void update_guild(Guild guild) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+        try {
+            dataOutputStream.writeUTF("all");
+            dataOutputStream.writeUTF("guild_update_guild");
+            dataOutputStream.writeUTF(guild.guildUUID.toString());
+            dataOutputStream.writeUTF(guild.guildName);
+            dataOutputStream.writeInt(guild.guildLevel);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+    }
 
 
     public static void set_guild_data(String server, Guild guild)

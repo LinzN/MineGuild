@@ -290,23 +290,23 @@ public class GuildQuery {
                 String guildName = result.getString("guild_name");
 
                 guild = new Guild(guildName, guildUUID);
-                guild.setLevel(result.getInt("guild_level"));
-                guild.setTotalExp(result.getLong("guild_experience"));
+                guild.set_level(result.getInt("guild_level"));
+                guild.set_total_exp(result.getLong("guild_experience"));
 
                 ArrayList<GuildRang> guildRangs = private_get_guild_rangs(guildUUID);
                 /* add to list */
                 for (GuildRang guildRang : guildRangs) {
-                    guild.setGuildRang(guildRang);
+                    guild.set_guild_rang(guildRang);
                 }
 
                 Location guildHome = private_get_guild_home(guildUUID);
-                guild.setGuildHome(guildHome);
+                guild.set_guild_home(guildHome);
 
                 ArrayList<GuildPlayer> guildPlayers = private_get_guild_players(guildUUID);
                 /* add to list */
                 for (GuildPlayer guildPlayer : guildPlayers) {
                     guildPlayer.setGuild(guild);
-                    guild.setGuildPlayer(guildPlayer);
+                    guild.addGuildPlayer(guildPlayer);
                 }
 
             }
