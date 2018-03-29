@@ -9,7 +9,7 @@
  *
  */
 
-package de.linzn.mineGuild.socket.checkStream;
+package de.linzn.mineGuild.socket.controlStream;
 
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
@@ -19,22 +19,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class JServerGuildCheckOutput {
+public class JServerGuildControlOutput {
 
-    public static String headerChannel = "mineGuild_check";
+    public static String headerChannel = "mineGuild_control";
 
-    public static void checkDeposit(Guild guild)
+    public static void set_guild_data(String server, Guild guild)
 
     {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
         try {
-            dataOutputStream.writeUTF("guild_check_deposit");
+            dataOutputStream.writeUTF(server);
+            dataOutputStream.writeUTF("guild_set_guild_data");
             dataOutputStream.writeUTF(guild.guildUUID.toString());
-            for (GuildPlayer guildPlayer : guild.guildPlayers) {
-                dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
-            }
+            dataOutputStream.writeUTF(guild.guildName);
+            dataOutputStream.writeInt(guild.guildLevel);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,18 +43,17 @@ public class JServerGuildCheckOutput {
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
-    public static void checkWithdraw(Guild guild)
+    public static void set_guildplayer_data(String server, GuildPlayer guildPlayer)
 
     {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
         try {
-            dataOutputStream.writeUTF("guild_check_withdraw");
-            dataOutputStream.writeUTF(guild.guildUUID.toString());
-            for (GuildPlayer guildPlayer : guild.guildPlayers) {
-                dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
-            }
+            dataOutputStream.writeUTF(server);
+            dataOutputStream.writeUTF("guild_set_guildplayer_data");
+            dataOutputStream.writeUTF(guildPlayer.getGuild().guildUUID.toString());
+            dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
 
         } catch (IOException e) {
             e.printStackTrace();

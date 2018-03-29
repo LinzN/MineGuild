@@ -9,7 +9,7 @@
  *
  */
 
-package de.linzn.mineGuild.socket.updateStream;
+package de.linzn.mineGuild.socket.controlStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
@@ -20,7 +20,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-public class JServerGuildUpdateListener implements IncomingDataListener {
+public class JServerGuildControlListener implements IncomingDataListener {
 
 
     @Override
@@ -29,13 +29,12 @@ public class JServerGuildUpdateListener implements IncomingDataListener {
         String subChannel;
         try {
             subChannel = in.readUTF();
-            if (subChannel.equalsIgnoreCase("add_guild_exp")) {
-                UUID guildUUID = UUID.fromString(in.readUTF());
-                double data = in.readDouble();
-                InternalGuildManager.add_exp_to_guild(guildUUID, data);
+
+            if (subChannel.equalsIgnoreCase("request_all_guild_data")) {
+                String serverName = in.readUTF();
+                InternalGuildManager.server_data_request(serverName);
                 return;
             }
-
 
         } catch (IOException e1) {
             e1.printStackTrace();

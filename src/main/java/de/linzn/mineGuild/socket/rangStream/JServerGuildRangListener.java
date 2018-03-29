@@ -9,7 +9,7 @@
  *
  */
 
-package de.linzn.mineGuild.socket.editStream;
+package de.linzn.mineGuild.socket.rangStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;

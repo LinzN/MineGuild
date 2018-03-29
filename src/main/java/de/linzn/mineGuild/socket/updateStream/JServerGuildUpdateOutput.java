@@ -22,6 +22,8 @@ import java.util.UUID;
 
 public class JServerGuildUpdateOutput {
 
+    public static String headerChannel = "mineGuild_update";
+
     public static void add_guildplayer(GuildPlayer guildPlayer) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
@@ -36,7 +38,7 @@ public class JServerGuildUpdateOutput {
             e.printStackTrace();
         }
 
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
     public static void remove_guildplayer(UUID guildUUID, UUID playerUUID) {
@@ -53,7 +55,7 @@ public class JServerGuildUpdateOutput {
             e.printStackTrace();
         }
 
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
     public static void add_guild(Guild guild) {
@@ -72,7 +74,7 @@ public class JServerGuildUpdateOutput {
             e.printStackTrace();
         }
 
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
 
     }
 
@@ -89,7 +91,7 @@ public class JServerGuildUpdateOutput {
             e.printStackTrace();
         }
 
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
 
     }
 
@@ -106,47 +108,7 @@ public class JServerGuildUpdateOutput {
             e.printStackTrace();
         }
 
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
-    }
-
-
-    public static void set_guild_data(String server, Guild guild)
-
-    {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-
-        try {
-            dataOutputStream.writeUTF(server);
-            dataOutputStream.writeUTF("guild_set_guild_data");
-            dataOutputStream.writeUTF(guild.guildUUID.toString());
-            dataOutputStream.writeUTF(guild.guildName);
-            dataOutputStream.writeInt(guild.guildLevel);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
-    }
-
-    public static void set_guildplayer_data(String server, GuildPlayer guildPlayer)
-
-    {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-
-        try {
-            dataOutputStream.writeUTF(server);
-            dataOutputStream.writeUTF("guild_set_guildplayer_data");
-            dataOutputStream.writeUTF(guildPlayer.getGuild().guildUUID.toString());
-            dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild_update", byteArrayOutputStream.toByteArray());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
 

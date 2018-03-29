@@ -19,7 +19,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class JServerGuildDefaultOutput {
+public class JServerGuildCommandOutput {
+
+    public static String headerChannel = "mineGuild_command";
 
     public static void sendGuildData(Guild guild)
 
@@ -41,7 +43,7 @@ public class JServerGuildDefaultOutput {
             e.printStackTrace();
         }
 
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients("mineGuild", byteArrayOutputStream.toByteArray());
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
 }

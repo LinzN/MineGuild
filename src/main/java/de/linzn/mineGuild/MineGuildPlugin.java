@@ -12,12 +12,19 @@
 package de.linzn.mineGuild;
 
 
+import de.linzn.jSocket.server.JServer;
 import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
-import de.linzn.mineGuild.socket.commandStream.JServerGuildDefaultListener;
+import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandListener;
+import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandOutput;
+import de.linzn.mineGuild.socket.controlStream.JServerGuildControlListener;
+import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
 import de.linzn.mineGuild.socket.editStream.JServerGuildEditListener;
-import de.linzn.mineGuild.socket.editStream.JServerGuildRangListener;
+import de.linzn.mineGuild.socket.editStream.JServerGuildEditOutput;
+import de.linzn.mineGuild.socket.rangStream.JServerGuildRangListener;
+import de.linzn.mineGuild.socket.rangStream.JServerGuildRangOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateListener;
+import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -37,10 +44,12 @@ public class MineGuildPlugin extends Plugin {
         this.getLogger().info("Enable MineGuild");
         inst = this;
         GuildManager.loadData();
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_default", new JServerGuildDefaultListener());
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_edit", new JServerGuildEditListener());
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_rang", new JServerGuildRangListener());
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer.registerIncomingDataListener("mineGuild_update", new JServerGuildUpdateListener());
+        JServer jServer = MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer;
+        jServer.registerIncomingDataListener(JServerGuildCommandOutput.headerChannel, new JServerGuildCommandListener());
+        jServer.registerIncomingDataListener(JServerGuildEditOutput.headerChannel, new JServerGuildEditListener());
+        jServer.registerIncomingDataListener(JServerGuildRangOutput.headerChannel, new JServerGuildRangListener());
+        jServer.registerIncomingDataListener(JServerGuildUpdateOutput.headerChannel, new JServerGuildUpdateListener());
+        jServer.registerIncomingDataListener(JServerGuildControlOutput.headerChannel, new JServerGuildControlListener());
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
     }
 }

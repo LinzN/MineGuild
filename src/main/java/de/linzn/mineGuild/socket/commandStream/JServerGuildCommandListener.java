@@ -20,7 +20,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-public class JServerGuildDefaultListener implements IncomingDataListener {
+public class JServerGuildCommandListener implements IncomingDataListener {
 
 
     @Override
