@@ -29,9 +29,7 @@ public class InternalGuildManager {
             return;
         }
         guild.addExperience(data);
-        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
-            GuildQuery.updateGuildRaw(guild);
-        });
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> GuildQuery.updateGuildRaw(guild));
     }
 
     public static void server_data_request(String serverName) {

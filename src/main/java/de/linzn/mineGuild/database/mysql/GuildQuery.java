@@ -473,7 +473,7 @@ public class GuildQuery {
             PreparedStatement sql = conn
                     .prepareStatement("SELECT guild_name FROM guild_object WHERE guild_uuid = '" + guild.guildUUID + "';");
             ResultSet result = sql.executeQuery();
-            if (!result.next()) {
+            if (result.next()) {
                 PreparedStatement insert = conn
                         .prepareStatement("UPDATE guild_object SET guild_level = '" + guild.guildLevel + "', guild_experience = '" + guild.guildExperience + "' WHERE guild_uuid = '" + guild.guildUUID + "';");
                 insert.executeUpdate();
