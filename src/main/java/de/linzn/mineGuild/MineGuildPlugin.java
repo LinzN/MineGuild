@@ -54,5 +54,8 @@ public class MineGuildPlugin extends Plugin {
         jServer.registerIncomingDataListener(JServerGuildControlOutput.headerChannel, new JServerGuildControlListener());
         jServer.registerIncomingDataListener(JServerGuildCheckOutput.headerChannel, new JServerGuildCheckListener());
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
+
+
+        //this.getProxy().getScheduler().schedule(this, () -> InternalGuildManager.migrate_guild_data(), 10, TimeUnit.SECONDS);
     }
 }

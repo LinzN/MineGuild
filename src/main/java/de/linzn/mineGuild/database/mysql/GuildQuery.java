@@ -11,6 +11,7 @@
 
 package de.linzn.mineGuild.database.mysql;
 
+import de.linzn.mineGuild.manager.GuildManager;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
@@ -445,7 +446,7 @@ public class GuildQuery {
         MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
-            PreparedStatement insert = null;
+            PreparedStatement insert;
             insert = conn.prepareStatement("SELECT guild_uuid FROM guild_home WHERE guild_uuid = '" + guild_uuid + "';");
             ResultSet result = insert.executeQuery();
             if (result.next()) {
@@ -453,7 +454,7 @@ public class GuildQuery {
                         .prepareStatement("UPDATE guild_home SET server = '" + location.getServer() + "', world = '" + location.getWorld() + "', x = '" + location.getX() + "', y = '" + location.getY() + "', z = '" + location.getZ() + "', yaw = '" + location.getYaw() + "', pitch = '" + location.getPitch() + "' WHERE guild_uuid = '" + guild_uuid + "';");
             } else {
                 insert = conn
-                        .prepareStatement("INSERT INTO guild_home (server, world, x, y z, yaw, pitch) VALUES ('" + location.getServer() + "', '" + location.getWorld() + "', '" + location.getX() + "', '" + location.getY() + "', '" + location.getZ() + "', '" + location.getYaw() + "', '" + location.getPitch() + "');");
+                        .prepareStatement("INSERT INTO guild_home (guild_uuid, server, world, x, y, z, yaw, pitch) VALUES ('" + guild_uuid + "', '" + location.getServer() + "', '" + location.getWorld() + "', '" + location.getX() + "', '" + location.getY() + "', '" + location.getZ() + "', '" + location.getYaw() + "', '" + location.getPitch() + "');");
             }
             insert.executeUpdate();
 
@@ -462,6 +463,105 @@ public class GuildQuery {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean updateGuildRaw(Guild guild) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement sql = conn
+                    .prepareStatement("SELECT guild_name FROM guild_object WHERE guild_uuid = '" + guild.guildUUID + "';");
+            ResultSet result = sql.executeQuery();
+            if (!result.next()) {
+                PreparedStatement insert = conn
+                        .prepareStatement("UPDATE guild_object SET guild_level = '" + guild.guildLevel + "', guild_experience = '" + guild.guildExperience + "' WHERE guild_uuid = '" + guild.guildUUID + "';");
+                insert.executeUpdate();
+                insert.close();
+                success = true;
+            }
+            result.close();
+            sql.close();
+            manager.release("MineSuiteGuild", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
+    public static HashSet<Guild> load_old_database_guilds() {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        HashSet<Guild> guilds = new HashSet<>();
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement sql = conn
+                    .prepareStatement("SELECT GuildUUID, GuildName, Level, Experience FROM guilds;");
+            ResultSet result = sql.executeQuery();
+            while (result.next()) {
+                UUID guildUUID = UUID.fromString(result.getString(1));
+                String guildName = result.getString(2);
+                Guild guild = new Guild(guildName, guildUUID);
+                guild.set_level(result.getInt(3));
+                guild.set_total_exp((result.getLong(4) / 100));
+                guilds.add(guild);
+            }
+            result.close();
+            for (Guild guild : guilds) {
+                sql = conn.prepareStatement(
+                        "SELECT Server, World, CordX, CordY, CordZ, Yaw, Pitch FROM guildSpawns WHERE GuildUUID = '"
+                                + guild.guildUUID.toString() + "';");
+                result = sql.executeQuery();
+                if (result.next()) {
+                    String server = result.getString(1);
+                    String world = result.getString(2);
+                    double x = result.getDouble(3);
+                    double y = result.getDouble(4);
+                    double z = result.getDouble(5);
+                    float yaw = result.getFloat(6);
+                    float pitch = result.getFloat(7);
+                    Location location = new Location(server, world, x, y, z, yaw, pitch);
+                    guild.set_guild_home(location);
+                }
+                result.close();
+
+                GuildRang memberRang = GuildManager.getDefaultRang("static_member");
+                GuildRang assistantRang = GuildManager.getDefaultRang("assistant");
+                GuildRang masterRang = GuildManager.getDefaultRang("static_master");
+
+                guild.set_guild_rang(masterRang);
+                guild.set_guild_rang(assistantRang);
+                guild.set_guild_rang(memberRang);
+
+                sql = conn.prepareStatement(
+                        "SELECT UUID, GuildRang FROM guildPlayers WHERE GuildUUID = '" + guild.guildUUID.toString() + "';");
+                result = sql.executeQuery();
+                while (result.next()) {
+                    UUID playerUUID = UUID.fromString(result.getString("UUID"));
+                    GuildPlayer guildPlayer = new GuildPlayer(playerUUID);
+                    String rangName = result.getString("GuildRang");
+                    guildPlayer.setGuild(guild);
+
+                    if (rangName.equalsIgnoreCase("MASTER")) {
+                        guildPlayer.setRangUUID(masterRang.rangUUID);
+                    } else if (rangName.equalsIgnoreCase("ASSISTANT")) {
+                        guildPlayer.setRangUUID(assistantRang.rangUUID);
+                    } else if (rangName.equalsIgnoreCase("MEMBER")) {
+                        guildPlayer.setRangUUID(memberRang.rangUUID);
+                    }
+                    guild.addGuildPlayer(guildPlayer);
+                }
+                result.close();
+            }
+
+            sql.close();
+            conn.close();
+            manager.release("MineSuiteGuild", conn);
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return guilds;
     }
 
 

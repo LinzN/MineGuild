@@ -2,14 +2,26 @@ package de.linzn.mineGuild.manager;
 
 import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.database.GuildDatabase;
+import de.linzn.mineGuild.database.mysql.GuildQuery;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.HashSet;
 import java.util.UUID;
 
 public class InternalGuildManager {
+    public static void migrate_guild_data() {
+        HashSet<Guild> old_guilds = GuildQuery.load_old_database_guilds();
+        for (Guild guild : old_guilds) {
+            GuildQuery.setGuild(guild);
+            MineGuildPlugin.inst().getLogger().info("Migrate guild " + guild.guildUUID);
+        }
+        GuildManager.loadData();
+        server_data_request("all");
+    }
+
 
     public static void add_exp_to_guild(UUID guildUUID, double data) {
         Guild guild = GuildDatabase.getGuild(guildUUID);
@@ -17,7 +29,9 @@ public class InternalGuildManager {
             return;
         }
         guild.addExperience(data);
-        //Todo Add Database save
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            GuildQuery.updateGuildRaw(guild);
+        });
     }
 
     public static void server_data_request(String serverName) {

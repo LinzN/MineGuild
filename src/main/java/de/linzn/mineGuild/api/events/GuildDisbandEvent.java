@@ -1,4 +1,4 @@
-package de.linzn.mineGuild.events;
+package de.linzn.mineGuild.api.events;
 
 import net.md_5.bungee.api.plugin.Event;
 

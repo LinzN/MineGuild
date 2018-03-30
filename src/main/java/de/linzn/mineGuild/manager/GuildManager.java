@@ -12,10 +12,10 @@
 package de.linzn.mineGuild.manager;
 
 import de.linzn.mineGuild.MineGuildPlugin;
+import de.linzn.mineGuild.api.events.GuildCreateEvent;
+import de.linzn.mineGuild.api.events.GuildDisbandEvent;
 import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.database.mysql.GuildQuery;
-import de.linzn.mineGuild.events.GuildCreateEvent;
-import de.linzn.mineGuild.events.GuildDisbandEvent;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPermission;
 import de.linzn.mineGuild.objects.GuildPlayer;
@@ -471,7 +471,7 @@ public class GuildManager {
         MineGuildPlugin.inst().getLogger().info("Loaded " + GuildDatabase.getGuilds().size() + " Guilds!");
     }
 
-    private static GuildRang getDefaultRang(String rangName) {
+    public static GuildRang getDefaultRang(String rangName) {
         GuildRang rang = null;
         if (rangName.equalsIgnoreCase("static_master")) {
             rang = new GuildRang("static_master", UUID.randomUUID());

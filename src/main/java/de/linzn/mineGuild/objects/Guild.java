@@ -13,7 +13,7 @@ package de.linzn.mineGuild.objects;
 
 
 import de.linzn.mineGuild.MineGuildPlugin;
-import de.linzn.mineGuild.events.GuildLevelUpEvent;
+import de.linzn.mineGuild.api.events.GuildLevelUpEvent;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
