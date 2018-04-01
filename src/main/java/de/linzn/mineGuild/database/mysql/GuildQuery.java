@@ -475,7 +475,7 @@ public class GuildQuery {
             ResultSet result = sql.executeQuery();
             if (result.next()) {
                 PreparedStatement insert = conn
-                        .prepareStatement("UPDATE guild_object SET guild_level = '" + guild.guildLevel + "', guild_experience = '" + guild.guildExperience + "' WHERE guild_uuid = '" + guild.guildUUID + "';");
+                        .prepareStatement("UPDATE guild_object SET guild_level = '" + guild.guildLevel + "', guild_experience = '" + guild.guildExperience + "' , guild_name = '" + guild.guildName + "' WHERE guild_uuid = '" + guild.guildUUID + "';");
                 insert.executeUpdate();
                 insert.close();
                 success = true;
@@ -483,6 +483,28 @@ public class GuildQuery {
             result.close();
             sql.close();
             manager.release("MineSuiteGuild", conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+
+    public static boolean updateGuildPlayer(GuildPlayer guildPlayer) {
+        MySQLConnectionManager manager = MySQLConnectionManager.DEFAULT;
+        boolean success = false;
+        Guild guild = guildPlayer.getGuild();
+        try {
+            Connection conn = manager.getConnection("MineSuiteGuild");
+            PreparedStatement insert = conn.prepareStatement("SELECT player_uuid FROM guild_entities WHERE player_uuid = '" + guildPlayer.getUUID() + "';");
+            ResultSet result = insert.executeQuery();
+            if (result.next()) {
+                insert = conn
+                        .prepareStatement("UPDATE guild_entities SET guild_uuid = '" + guild.guildUUID.toString() + "', guild_rang = '" + guildPlayer.getGuildRang().rangUUID.toString() + "' WHERE player_uuid = '" + guildPlayer.getUUID() + "';");
+            }
+            insert.executeUpdate();
+            insert.close();
+            manager.release("MineSuiteGuild", conn);
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         }

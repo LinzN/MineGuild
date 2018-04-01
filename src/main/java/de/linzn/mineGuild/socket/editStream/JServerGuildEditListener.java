@@ -13,6 +13,8 @@ package de.linzn.mineGuild.socket.editStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
+import de.linzn.mineGuild.manager.GuildManager;
+import de.linzn.mineSuite.bungee.utils.Location;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -29,8 +31,29 @@ public class JServerGuildEditListener implements IncomingDataListener {
         try {
             subChannel = in.readUTF();
 
-            if (subChannel.equalsIgnoreCase("test")) {
-
+            if (subChannel.equalsIgnoreCase("guild_edit_guild_name")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                String guildName = in.readUTF();
+                GuildManager.setGuildName(actorUUID, guildName);
+                return;
+            }
+            if (subChannel.equalsIgnoreCase("guild_edit_guild_master")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                String playerName = in.readUTF();
+                GuildManager.setGuildMaster(actorUUID, playerName);
+                return;
+            }
+            if (subChannel.equalsIgnoreCase("guild_edit_guild_home")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                String server = in.readUTF();
+                String world = in.readUTF();
+                double X = in.readDouble();
+                double Y = in.readDouble();
+                double Z = in.readDouble();
+                float yaw = in.readFloat();
+                float pitch = in.readFloat();
+                Location location = new Location(server, world, X, Y, Z, yaw, pitch);
+                GuildManager.setGuildHome(actorUUID, location);
                 return;
             }
 

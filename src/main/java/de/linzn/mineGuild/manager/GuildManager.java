@@ -34,6 +34,95 @@ import java.util.concurrent.TimeUnit;
 
 public class GuildManager {
 
+    public static void setGuildHome(UUID actor, Location location) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.SETHOME)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        guild.set_guild_home(location);
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            GuildQuery.set_guild_home(guild.guildUUID, location);
+        });
+        guild.broadcastInGuild(LanguageDB.guild_new_Home.replace("{actor}", actorP.getName()));
+    }
+
+    public static void setGuildMaster(UUID actor, String playerName) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.SETGUILDMASTER)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        GuildPlayer newMaster = GuildDatabase.getGuildPlayer(playerName);
+        if (newMaster == null) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
+        if (newMaster.getGuild() != guild) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+        if (newMaster == guildPlayer) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
+        GuildRang masterRang = guild.getGuildRang("static_master");
+        GuildRang memberRang = guild.getGuildRang("static_member");
+
+        newMaster.setRangUUID(masterRang.rangUUID);
+        guildPlayer.setRangUUID(memberRang.rangUUID);
+
+        String masterName = BungeeQuery.getPlayerName(newMaster.getUUID());
+        guild.broadcastInGuild(LanguageDB.guild_new_master.replace("{guildmaster}", masterName));
+
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
+            GuildQuery.updateGuildPlayer(newMaster);
+            GuildQuery.updateGuildPlayer(guildPlayer);
+        });
+
+    }
+
+    public static void setGuildName(UUID actor, String guildName) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.SETGUILDNAME)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        guild.set_guild_name(guildName);
+        guild.broadcastInGuild(LanguageDB.guild_change_name.replace("{actor}", actorP.getName()).replace("{guild}", guild.guildName));
+
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> GuildQuery.updateGuildRaw(guild));
+    }
+
 
     public static void showGuildList(UUID actor, int page) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
@@ -380,8 +469,7 @@ public class GuildManager {
         GuildCreateEvent gEvent = new GuildCreateEvent(guild, owner.getUUID());
         MineGuildPlugin.inst().getProxy().getPluginManager().callEvent(gEvent);
 
-        JServerGuildUpdateOutput.add_guild(guild);
-        JServerGuildUpdateOutput.add_guildplayer(owner);
+        JServerGuildUpdateOutput.add_guild(guild, owner.getUUID());
         return true;
     }
 

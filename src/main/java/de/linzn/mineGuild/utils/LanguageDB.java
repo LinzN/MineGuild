@@ -33,6 +33,9 @@ public class LanguageDB {
     public static String guild_new_member = ChatColor.GREEN + "Spieler " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "hat sich der Gilde angeschlossen. Willkommen!";
     public static String guild_kicked_player = ChatColor.RED + "Spieler {player} wurde aus der Gilde von {actor} entfernt!";
     public static String guild_player_leave = ChatColor.YELLOW + "Spieler {player} hat die Gilde gerade verlassen!";
+    public static String guild_change_name = ChatColor.YELLOW + "Spieler {actor} hat den Gildennamen zu {guild} geändert!";
+    public static String guild_new_master = ChatColor.YELLOW + "Spieler {guildmaster} ist jetzt Gildenmeister!";
+    public static String guild_new_Home = ChatColor.YELLOW + "Spieler {actor} hat das Gildenhome neu gesetzt!";
 
     /* Success */
     public static String you_create_guild = ChatColor.DARK_GREEN + "Glückwunsch. Du hast eine neue Gilde namens " + ChatColor.YELLOW + "{guild} " + ChatColor.DARK_GREEN + "erstellt!";

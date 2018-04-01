@@ -58,7 +58,7 @@ public class JServerGuildUpdateOutput {
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
-    public static void add_guild(Guild guild) {
+    public static void add_guild(Guild guild, UUID owner) {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
@@ -66,8 +66,8 @@ public class JServerGuildUpdateOutput {
         try {
             dataOutputStream.writeUTF("all");
             dataOutputStream.writeUTF("guild_add_guild");
+            dataOutputStream.writeUTF(owner.toString());
             dataOutputStream.writeUTF(guild.guildUUID.toString());
-            dataOutputStream.writeUTF(guild.guildName);
             dataOutputStream.writeInt(guild.guildLevel);
 
         } catch (IOException e) {
@@ -102,7 +102,6 @@ public class JServerGuildUpdateOutput {
             dataOutputStream.writeUTF("all");
             dataOutputStream.writeUTF("guild_update_guild");
             dataOutputStream.writeUTF(guild.guildUUID.toString());
-            dataOutputStream.writeUTF(guild.guildName);
             dataOutputStream.writeInt(guild.guildLevel);
         } catch (IOException e) {
             e.printStackTrace();
