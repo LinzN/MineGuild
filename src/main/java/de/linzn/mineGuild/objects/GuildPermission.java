@@ -34,7 +34,8 @@ public enum GuildPermission {
     LIST("GUILD::LIST"),
     MEMBERS("GUILD::MEMBERS"),
     CREATE("GUILD::CREATE"),
-    SETRANG("GUILD::SETRANG");
+    SETPLAYERRANG("GUILD::SETPLAYERRANG"),
+    EDITRANG("GUILD::EDITRANG");
 
     private static final Map<String, GuildPermission> lookup = new HashMap<>();
 

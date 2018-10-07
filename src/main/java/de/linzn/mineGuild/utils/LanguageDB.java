@@ -17,6 +17,7 @@ public class LanguageDB {
     public static String guild_no_home = ChatColor.DARK_RED + "Die Gilde hat keinen Homepunkt gesetzt!";
     public static String you_can_not_leave_guild = ChatColor.DARK_RED + "Du kannst die Gilde so nicht verlassen. Bist du Gildenmeister?";
     public static String database_error = "" + ChatColor.DARK_RED + ChatColor.BOLD + "Es ist ein Datenbankfehler aufgetreten. Bitte an ein Teammitglied wenden!";
+    public static String not_a_guild_rang = ChatColor.DARK_RED + "Diesen Rang gibt es nicht!";
 
     /* Info */
     public static String guild_invitation_expired = ChatColor.YELLOW + "Die Einladung ist abgelaufen!";
@@ -35,6 +36,7 @@ public class LanguageDB {
     public static String guild_player_leave = ChatColor.YELLOW + "Spieler {player} hat die Gilde gerade verlassen!";
     public static String guild_change_name = ChatColor.YELLOW + "Spieler {actor} hat den Gildennamen zu {guild} geändert!";
     public static String guild_new_master = ChatColor.YELLOW + "Spieler {guildmaster} ist jetzt Gildenmeister!";
+    public static String guild_set_playerrang = ChatColor.YELLOW + "Spieler {target} wurde von {actor} auf den Rang {rang} gesetzt!";
     public static String guild_new_Home = ChatColor.YELLOW + "Spieler {actor} hat das Gildenhome neu gesetzt!";
 
     /* Success */

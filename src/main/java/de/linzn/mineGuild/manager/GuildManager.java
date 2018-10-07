@@ -103,6 +103,56 @@ public class GuildManager {
 
     }
 
+    public static void setPlayerRANG(UUID actor, String playerName, String rangName) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer actorGuildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (actorGuildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = actorGuildPlayer.getGuild();
+
+        if (!guild.hasPermission(actorGuildPlayer, GuildPermission.SETPLAYERRANG)) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        GuildPlayer targetGuildPlayer = GuildDatabase.getGuildPlayer(playerName);
+        if (targetGuildPlayer == null) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
+        if (targetGuildPlayer.getGuild() != guild) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+        if (targetGuildPlayer == actorGuildPlayer) {
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+        GuildRang masterRang = guild.getGuildRang("static_master");
+
+        if (targetGuildPlayer.getGuildRang() == masterRang){
+            actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
+        GuildRang newRang = guild.getGuildRang(rangName);
+        if (newRang == null){
+            actorP.sendMessage(LanguageDB.not_a_guild_rang);
+            return;
+        }
+
+        targetGuildPlayer.setRangUUID(newRang.rangUUID);
+
+        String targetName = BungeeQuery.getPlayerName(targetGuildPlayer.getUUID());
+        guild.broadcastInGuild(LanguageDB.guild_set_playerrang.replace("{actor}", actorP.getName()).replace("{target}", targetName).replace("{rang}", newRang.rangName));
+
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> GuildQuery.updateGuildPlayer(targetGuildPlayer));
+    }
+
     public static void setGuildName(UUID actor, String guildName) {
         ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
         GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
@@ -569,7 +619,7 @@ public class GuildManager {
             rang = new GuildRang("assistant", UUID.randomUUID());
             rang.setPermission(GuildPermission.INVITE);
             rang.setPermission(GuildPermission.DEPOSIT);
-            rang.setPermission(GuildPermission.SETRANG);
+            rang.setPermission(GuildPermission.SETPLAYERRANG);
         } else if (rangName.equalsIgnoreCase("static_member")) {
             rang = new GuildRang("static_member", UUID.randomUUID());
             rang.setPermission(GuildPermission.HOME);
