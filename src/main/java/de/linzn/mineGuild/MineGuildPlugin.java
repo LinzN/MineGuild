@@ -27,7 +27,9 @@ import de.linzn.mineGuild.socket.rangStream.JServerGuildRangListener;
 import de.linzn.mineGuild.socket.rangStream.JServerGuildRangOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateListener;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
+import de.linzn.mineGuild.utils.GuildChat;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
+import de.linzn.mineSuite.bungee.module.chat.ChatManager;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class MineGuildPlugin extends Plugin {
@@ -55,7 +57,7 @@ public class MineGuildPlugin extends Plugin {
         jServer.registerIncomingDataListener(JServerGuildCheckOutput.headerChannel, new JServerGuildCheckListener());
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
 
-
+        ChatManager.registerChat(new GuildChat());
         //this.getProxy().getScheduler().schedule(this, () -> InternalGuildManager.migrate_guild_data(), 10, TimeUnit.SECONDS);
     }
 }
