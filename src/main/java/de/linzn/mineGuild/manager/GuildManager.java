@@ -24,6 +24,7 @@ import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineGuild.utils.LanguageDB;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
+import de.linzn.mineSuite.bungee.module.chat.IChatChannel;
 import de.linzn.mineSuite.bungee.module.teleport.TeleportManager;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
@@ -594,6 +595,9 @@ public class GuildManager {
     }
 
     public static void broadcastGlobal(String text) {
-        ChatManager.broadcastChat(text);
+        IChatChannel broadcastChannel =  ChatManager.getChat("BROADCAST");
+        if (broadcastChannel != null) {
+            broadcastChannel.sendChat(null, text, null, null);
+        }
     }
 }
