@@ -576,6 +576,7 @@ public class GuildManager {
             rang.setPermission(GuildPermission.HELP);
             rang.setPermission(GuildPermission.INFO);
             rang.setPermission(GuildPermission.LEAVE);
+            rang.setPermission(GuildPermission.CHAT);
         }
         return rang;
     }

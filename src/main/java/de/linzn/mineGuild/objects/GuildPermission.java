@@ -21,6 +21,7 @@ public enum GuildPermission {
     WITHDRAW("GUILD::WITHDRAW"),
     RANGS("GUILD::RANGS"),
     HOME("GUILD::HOME"),
+    CHAT("GUILD::CHAT"),
     INVITE("GUILD::INVITE"),
     KICK("GUILD::KICK"),
     LEAVE("GUILD::LEAVE"),
