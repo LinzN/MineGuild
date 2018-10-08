@@ -102,13 +102,15 @@ public class JServerGuildCommandListener implements IncomingDataListener {
             if (subChannel.equalsIgnoreCase("guild_deposit_to_guild")) {
                 UUID actor = UUID.fromString(in.readUTF());
                 double amount = in.readDouble();
-                //GuildManager.showGuildList(actor, page);
+                String sourceServer = in.readUTF();
+                GuildManager.player_deposit_task(actor, amount, sourceServer);
                 return;
             }
             if (subChannel.equalsIgnoreCase("guild_withdraw_from_guild")) {
                 UUID actor = UUID.fromString(in.readUTF());
                 double amount = in.readDouble();
-                //GuildManager.showGuildList(actor, page);
+                String sourceServer = in.readUTF();
+                GuildManager.player_withdraw_task(actor, amount, sourceServer);
             }
 
         } catch (IOException e1) {

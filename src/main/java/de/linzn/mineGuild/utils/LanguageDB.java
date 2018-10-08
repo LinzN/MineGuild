@@ -25,6 +25,7 @@ public class LanguageDB {
     public static String you_get_guild_invitation = ChatColor.YELLOW + "{actor} " + ChatColor.GREEN + " möchte dich in die Gilde " + ChatColor.YELLOW + "{guild} " + ChatColor.GREEN + "aufnehmen.\n" + ChatColor.GREEN + "Gib " + ChatColor.YELLOW + "/guild accept " + ChatColor.GREEN + "um anzunehmen oder " + ChatColor.YELLOW + "/guild deny " + ChatColor.GREEN + "um abzulehnen ein.";
     public static String you_kicked_from_guild = ChatColor.YELLOW + "Du wurdest von {actor} aus der Gilde entfernt!";
     public static String no_entries_on_page = ChatColor.RED + "Es wurden hier keine Einträge gefunden!";
+    public static String guild_transaction = ChatColor.YELLOW + "Versuche Transaktion..";
 
     /* Guild broadcast */
     public static String guild_get_guild_invitation = ChatColor.GREEN + "Es wurde " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "in die Gilde eingeladen sich dieser anzuschliesen!";

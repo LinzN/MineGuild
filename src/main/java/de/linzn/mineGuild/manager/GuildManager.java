@@ -651,4 +651,47 @@ public class GuildManager {
             broadcastChannel.sendChat(null, text, null, null);
         }
     }
+
+    public static void player_withdraw_task(UUID actor, double amount, String sourceServer){
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        if (player == null) {
+            return;
+        }
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+        if (guildPlayer == null) {
+            player.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.WITHDRAW)) {
+            player.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+        player.sendMessage(LanguageDB.guild_transaction);
+        JServerGuildUpdateOutput.accept_withdraw(actor, amount, sourceServer);
+    }
+
+    public static void player_deposit_task(UUID actor, double amount, String sourceServer){
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
+        if (player == null) {
+            return;
+        }
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+        if (guildPlayer == null) {
+            player.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+
+        Guild guild = guildPlayer.getGuild();
+
+        if (!guild.hasPermission(guildPlayer, GuildPermission.DEPOSIT)) {
+            player.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        player.sendMessage(LanguageDB.guild_transaction);
+        JServerGuildUpdateOutput.accept_deposit(actor, amount, sourceServer);
+    }
 }
