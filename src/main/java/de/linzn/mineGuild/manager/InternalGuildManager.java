@@ -37,18 +37,16 @@ public class InternalGuildManager {
         HashSet<Guild> guilds = new HashSet<>(GuildDatabase.getGuilds());
         for (Guild guild : guilds) {
             JServerGuildControlOutput.set_guild_data(serverName, guild);
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ignored) {
-            }
         }
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ignored) {
+        }
+
         for (Guild guild : guilds) {
             for (GuildPlayer guildPlayer : guild.guildPlayers) {
                 JServerGuildControlOutput.set_guildplayer_data(serverName, guildPlayer);
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ignored) {
-                }
             }
         }
     }
