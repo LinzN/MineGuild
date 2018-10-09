@@ -447,7 +447,7 @@ public class GuildManager {
         double guildExperience = guild.guildExperience;
         double requiredGuildExperience = guild.getGuildRequiredExperience();
         String server = player.getServer().getInfo().getName();
-        double guildBalance = BungeeManager.request_balance(server, "guild-" + guild.guildUUID.toString());
+        double guildBalance = BungeeManager.request_balance(server, "guild_" + guild.guildUUID.toString());
 
         player.sendMessage(LanguageDB.interface_guildinfo_header);
         player.sendMessage(LanguageDB.interface_guildinfo_name.replace("{guild}", guild.guildName));
