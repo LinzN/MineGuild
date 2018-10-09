@@ -670,7 +670,7 @@ public class GuildManager {
             return;
         }
         player.sendMessage(LanguageDB.guild_transaction);
-        JServerGuildUpdateOutput.accept_withdraw(actor, amount, sourceServer);
+        JServerGuildUpdateOutput.accept_withdraw(guild.guildUUID, actor, amount, sourceServer);
     }
 
     public static void player_deposit_task(UUID actor, double amount, String sourceServer){
@@ -692,6 +692,6 @@ public class GuildManager {
         }
 
         player.sendMessage(LanguageDB.guild_transaction);
-        JServerGuildUpdateOutput.accept_deposit(actor, amount, sourceServer);
+        JServerGuildUpdateOutput.accept_deposit(guild.guildUUID, actor, amount, sourceServer);
     }
 }

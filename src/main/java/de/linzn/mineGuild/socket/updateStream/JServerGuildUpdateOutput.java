@@ -110,12 +110,13 @@ public class JServerGuildUpdateOutput {
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
-    public static void accept_withdraw(UUID actor, double amount, String sourceServer){
+    public static void accept_withdraw(UUID guildUUID, UUID actor, double amount, String sourceServer){
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
         try {
             dataOutputStream.writeUTF(sourceServer);
             dataOutputStream.writeUTF("guild_accept_withdraw");
+            dataOutputStream.writeUTF(guildUUID.toString());
             dataOutputStream.writeUTF(actor.toString());
             dataOutputStream.writeDouble(amount);
         } catch (IOException e) {
@@ -125,12 +126,13 @@ public class JServerGuildUpdateOutput {
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
-    public static void accept_deposit(UUID actor, double amount, String sourceServer){
+    public static void accept_deposit(UUID guildUUID, UUID actor, double amount, String sourceServer){
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
         try {
             dataOutputStream.writeUTF(sourceServer);
             dataOutputStream.writeUTF("guild_accept_deposit");
+            dataOutputStream.writeUTF(guildUUID.toString());
             dataOutputStream.writeUTF(actor.toString());
             dataOutputStream.writeDouble(amount);
         } catch (IOException e) {
