@@ -25,6 +25,7 @@ import de.linzn.mineGuild.utils.LanguageDB;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
 import de.linzn.mineSuite.bungee.module.chat.IChatChannel;
+import de.linzn.mineSuite.bungee.module.core.BungeeManager;
 import de.linzn.mineSuite.bungee.module.teleport.TeleportManager;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
@@ -445,11 +446,14 @@ public class GuildManager {
         int guildLevel = guild.guildLevel;
         double guildExperience = guild.guildExperience;
         double requiredGuildExperience = guild.getGuildRequiredExperience();
+        String server = player.getServer().getInfo().getName();
+        double guildBalance = BungeeManager.request_balance(server, "guild-" + guild.guildUUID.toString());
 
         player.sendMessage(LanguageDB.interface_guildinfo_header);
         player.sendMessage(LanguageDB.interface_guildinfo_name.replace("{guild}", guild.guildName));
         player.sendMessage(LanguageDB.interface_guildinfo_membersize.replace("{guild_size}", "" + size));
         player.sendMessage(LanguageDB.interface_guildinfo_guildlevel.replace("{guild_level}", "" + guildLevel));
+        player.sendMessage(LanguageDB.interface_guildinfo_balance.replace("{balance}", "" + guildBalance));
         player.sendMessage(LanguageDB.interface_guildinfo_guildexperience.replace("{exp}", "" + guildExperience).replace("{totalExp}", "" + requiredGuildExperience));
     }
 

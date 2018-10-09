@@ -52,6 +52,7 @@ public class LanguageDB {
     public static String interface_guildinfo_name = ChatColor.GREEN + "Name: " + ChatColor.YELLOW + "{guild}";
     public static String interface_guildinfo_membersize = ChatColor.GREEN + "Mitgliederstärke: " + ChatColor.YELLOW + "{guild_size}";
     public static String interface_guildinfo_guildlevel = ChatColor.GREEN + "Gildenlevel: " + ChatColor.YELLOW + "{guild_level}";
+    public static String interface_guildinfo_balance = ChatColor.GREEN + "Balance: " + ChatColor.YELLOW + "{balance} Mines";
     public static String interface_guildinfo_guildexperience = ChatColor.GREEN + "Erfahrung: " + ChatColor.YELLOW + "{exp}/{totalExp}";
 
     public static String interface_guildmembers_header = ChatColor.GOLD + "-===============[" + ChatColor.DARK_GREEN + "Gilden Mitglieder" + ChatColor.GOLD + "]===============-";
