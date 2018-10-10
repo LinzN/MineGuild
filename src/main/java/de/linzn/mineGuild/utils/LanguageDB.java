@@ -39,6 +39,7 @@ public class LanguageDB {
     public static String guild_new_master = ChatColor.YELLOW + "Spieler {guildmaster} ist jetzt Gildenmeister!";
     public static String guild_set_playerrang = ChatColor.YELLOW + "Spieler {target} wurde von {actor} auf den Rang {rang} gesetzt!";
     public static String guild_new_Home = ChatColor.YELLOW + "Spieler {actor} hat das Gildenhome neu gesetzt!";
+    public static String guild_level_up = ChatColor.YELLOW + "Die Gilde hat das Level {level} erreicht!";
 
     /* Success */
     public static String you_create_guild = ChatColor.DARK_GREEN + "Glückwunsch. Du hast eine neue Gilde namens " + ChatColor.YELLOW + "{guild} " + ChatColor.DARK_GREEN + "erstellt!";
