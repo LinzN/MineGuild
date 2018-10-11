@@ -13,10 +13,9 @@ package de.linzn.mineGuild;
 
 
 import de.linzn.jSocket.server.JServer;
+import de.linzn.mineGuild.commands.GuildMigrate;
 import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
-import de.linzn.mineGuild.socket.checkStream.JServerGuildCheckListener;
-import de.linzn.mineGuild.socket.checkStream.JServerGuildCheckOutput;
 import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandListener;
 import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandOutput;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlListener;
@@ -48,16 +47,15 @@ public class MineGuildPlugin extends Plugin {
         this.getLogger().info("Enable MineGuild");
         inst = this;
         GuildManager.loadData();
+        this.getProxy().getPluginManager().registerCommand(this, new GuildMigrate("guildmigrate"));
         JServer jServer = MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer;
         jServer.registerIncomingDataListener(JServerGuildCommandOutput.headerChannel, new JServerGuildCommandListener());
         jServer.registerIncomingDataListener(JServerGuildEditOutput.headerChannel, new JServerGuildEditListener());
         jServer.registerIncomingDataListener(JServerGuildRangOutput.headerChannel, new JServerGuildRangListener());
         jServer.registerIncomingDataListener(JServerGuildUpdateOutput.headerChannel, new JServerGuildUpdateListener());
         jServer.registerIncomingDataListener(JServerGuildControlOutput.headerChannel, new JServerGuildControlListener());
-        jServer.registerIncomingDataListener(JServerGuildCheckOutput.headerChannel, new JServerGuildCheckListener());
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
 
         ChatManager.registerChat(new GuildChat());
-        //this.getProxy().getScheduler().schedule(this, () -> InternalGuildManager.migrate_guild_data(), 10, TimeUnit.SECONDS);
     }
 }

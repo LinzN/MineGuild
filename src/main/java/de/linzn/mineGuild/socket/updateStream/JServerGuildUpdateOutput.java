@@ -142,5 +142,20 @@ public class JServerGuildUpdateOutput {
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
 
+    public static void send_plugin_migrate(UUID guildUUID, String guildName){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+        try {
+            dataOutputStream.writeUTF("all");
+            dataOutputStream.writeUTF("plugin_migrate_data");
+            dataOutputStream.writeUTF(guildUUID.toString());
+            dataOutputStream.writeUTF(guildName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
+    }
+
 
 }

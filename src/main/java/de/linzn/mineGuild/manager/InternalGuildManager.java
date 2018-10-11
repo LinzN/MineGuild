@@ -6,6 +6,7 @@ import de.linzn.mineGuild.database.mysql.GuildQuery;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
+import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.HashSet;
@@ -16,6 +17,7 @@ public class InternalGuildManager {
         HashSet<Guild> old_guilds = GuildQuery.load_old_database_guilds();
         for (Guild guild : old_guilds) {
             GuildQuery.setGuild(guild);
+            JServerGuildUpdateOutput.send_plugin_migrate(guild.guildUUID, guild.guildName);
             MineGuildPlugin.inst().getLogger().info("Migrate guild " + guild.guildUUID);
         }
         GuildManager.loadData();
