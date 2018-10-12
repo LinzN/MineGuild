@@ -17,11 +17,13 @@ import java.util.UUID;
 public class GuildRang {
     public UUID rangUUID;
     public String rangName;
+    public int priority;
     public ArrayList<GuildPermission> permissions;
 
-    public GuildRang(String rangName, UUID rangUUID) {
+    public GuildRang(String rangName, UUID rangUUID, int priority) {
         this.rangName = rangName.toUpperCase();
         this.rangUUID = rangUUID;
+        this.priority = priority;
         this.permissions = new ArrayList<>();
     }
 

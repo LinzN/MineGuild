@@ -146,6 +146,11 @@ public class GuildManager {
             return;
         }
 
+        if (newRang.priority <= actorGuildPlayer.getGuildRang().priority){
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
         targetGuildPlayer.setRangUUID(newRang.rangUUID);
 
         String targetName = BungeeQuery.getPlayerName(targetGuildPlayer.getUUID());
@@ -617,20 +622,28 @@ public class GuildManager {
     public static GuildRang getDefaultRang(String rangName) {
         GuildRang rang = null;
         if (rangName.equalsIgnoreCase("static_master")) {
-            rang = new GuildRang("static_master", UUID.randomUUID());
+            rang = new GuildRang("static_master", UUID.randomUUID(), -1);
             rang.setPermission(GuildPermission.MASTERKEY);
         } else if (rangName.equalsIgnoreCase("assistant")) {
-            rang = new GuildRang("assistant", UUID.randomUUID());
+            rang = new GuildRang("assistant", UUID.randomUUID(), 1);
             rang.setPermission(GuildPermission.INVITE);
-            rang.setPermission(GuildPermission.DEPOSIT);
             rang.setPermission(GuildPermission.SETPLAYERRANG);
-        } else if (rangName.equalsIgnoreCase("static_member")) {
-            rang = new GuildRang("static_member", UUID.randomUUID());
+            rang.setPermission(GuildPermission.WITHDRAW);
+
             rang.setPermission(GuildPermission.HOME);
             rang.setPermission(GuildPermission.HELP);
             rang.setPermission(GuildPermission.INFO);
             rang.setPermission(GuildPermission.LEAVE);
             rang.setPermission(GuildPermission.CHAT);
+            rang.setPermission(GuildPermission.DEPOSIT);
+        } else if (rangName.equalsIgnoreCase("static_member")) {
+            rang = new GuildRang("static_member", UUID.randomUUID(), 2);
+            rang.setPermission(GuildPermission.HOME);
+            rang.setPermission(GuildPermission.HELP);
+            rang.setPermission(GuildPermission.INFO);
+            rang.setPermission(GuildPermission.LEAVE);
+            rang.setPermission(GuildPermission.CHAT);
+            rang.setPermission(GuildPermission.DEPOSIT);
         }
         return rang;
     }
