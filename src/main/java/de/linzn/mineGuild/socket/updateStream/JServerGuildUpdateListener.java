@@ -14,6 +14,10 @@ package de.linzn.mineGuild.socket.updateStream;
 
 import de.linzn.jSocket.core.IncomingDataListener;
 import de.linzn.mineGuild.manager.InternalGuildManager;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONString;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -29,11 +33,14 @@ public class JServerGuildUpdateListener implements IncomingDataListener {
         String subChannel;
         try {
             subChannel = in.readUTF();
-            if (subChannel.equalsIgnoreCase("add_guild_exp")) {
-                UUID guildUUID = UUID.fromString(in.readUTF());
-                double data = in.readDouble();
-                InternalGuildManager.add_exp_to_guild(guildUUID, data);
-                return;
+            if (subChannel.equalsIgnoreCase("add_experience_sync")) {
+                JSONArray jsonArray = new JSONArray(in.readUTF());
+                for (Object object : jsonArray){
+                    JSONObject jsonObject = (JSONObject) object;
+                    UUID guildUUID = UUID.fromString(jsonObject.getString("guildUUID"));
+                    double data = jsonObject.getDouble("guildExperience");
+                    InternalGuildManager.add_exp_to_guild(guildUUID, data);
+                }
             }
 
 
