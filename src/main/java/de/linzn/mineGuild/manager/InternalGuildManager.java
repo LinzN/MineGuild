@@ -1,5 +1,6 @@
 package de.linzn.mineGuild.manager;
 
+import com.google.gson.JsonObject;
 import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.database.mysql.GuildQuery;
@@ -8,6 +9,8 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import net.md_5.bungee.api.ProxyServer;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -34,23 +37,31 @@ public class InternalGuildManager {
         ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> GuildQuery.updateGuildRaw(guild));
     }
 
-    public static void server_data_request(String serverName) {
+
+    public static void server_data_request(String serverName){
         MineGuildPlugin.inst().getLogger().info("Request guild_data for server " + serverName);
         HashSet<Guild> guilds = new HashSet<>(GuildDatabase.getGuilds());
-        for (Guild guild : guilds) {
-            JServerGuildControlOutput.set_guild_data(serverName, guild);
-        }
-
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException ignored) {
-        }
 
         for (Guild guild : guilds) {
-            for (GuildPlayer guildPlayer : guild.guildPlayers) {
-                JServerGuildControlOutput.set_guildplayer_data(serverName, guildPlayer);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("guildUUID", guild.guildUUID.toString());
+            jsonObject.put("guildName", guild.guildName);
+            jsonObject.put("guildLevel", guild.guildLevel);
+
+            JSONArray jsonArray = new JSONArray();
+            for (GuildPlayer guildPlayer : guild.guildPlayers){
+                jsonArray.put(guildPlayer.getUUID().toString());
+            }
+            jsonObject.put("guildMembers", jsonArray);
+            MineGuildPlugin.inst().getLogger().info("Build JSONObject for " + guild.guildUUID.toString());
+            JServerGuildControlOutput.send_guild_packet(serverName, jsonObject);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
     }
 
 }

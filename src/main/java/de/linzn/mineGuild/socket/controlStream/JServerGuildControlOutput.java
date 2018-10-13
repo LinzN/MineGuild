@@ -11,9 +11,8 @@
 
 package de.linzn.mineGuild.socket.controlStream;
 
-import de.linzn.mineGuild.objects.Guild;
-import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -23,7 +22,7 @@ public class JServerGuildControlOutput {
 
     public static String headerChannel = "mineGuild_control";
 
-    public static void set_guild_data(String server, Guild guild)
+    public static void send_guild_packet(String server, JSONObject jsonObject)
 
     {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -31,10 +30,8 @@ public class JServerGuildControlOutput {
 
         try {
             dataOutputStream.writeUTF(server);
-            dataOutputStream.writeUTF("guild_set_guild_data");
-            dataOutputStream.writeUTF(guild.guildUUID.toString());
-            dataOutputStream.writeUTF(guild.guildName);
-            dataOutputStream.writeInt(guild.guildLevel);
+            dataOutputStream.writeUTF("guild_set_guild_packet");
+            dataOutputStream.writeUTF(jsonObject.toString());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,25 +39,5 @@ public class JServerGuildControlOutput {
 
         MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
     }
-
-    public static void set_guildplayer_data(String server, GuildPlayer guildPlayer)
-
-    {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-
-        try {
-            dataOutputStream.writeUTF(server);
-            dataOutputStream.writeUTF("guild_set_guildplayer_data");
-            dataOutputStream.writeUTF(guildPlayer.getGuild().guildUUID.toString());
-            dataOutputStream.writeUTF(guildPlayer.getUUID().toString());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        MineSuiteBungeePlugin.getInstance().getMineJSocketServer().broadcastClients(headerChannel, byteArrayOutputStream.toByteArray());
-    }
-
 
 }
