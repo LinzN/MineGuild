@@ -10,7 +10,7 @@ import net.md_5.bungee.event.EventHandler;
 
 public class ConnectionListener implements Listener {
     @EventHandler
-    public void onPlayerLogin(PlayerDisconnectEvent event) {
+    public void onPlayerQuite(PlayerDisconnectEvent event) {
         GuildDatabase.removeGuildInvitation(event.getPlayer().getUniqueId());
     }
     @EventHandler
