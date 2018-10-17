@@ -77,7 +77,13 @@ public class Guild {
     }
 
     public void addExperience(double data) {
-        int maxLevel = 30;
+        int maxLevel = 60;
+
+        if (this.guildLevel == maxLevel) {
+            this.guildExperience = 0L;
+            return;
+        }
+
         if (this.guildExperience + data >= getGuildRequiredExperience()) {
             double nextExp = this.guildExperience + data - getGuildRequiredExperience();
             this.guildExperience = 0L;
@@ -87,10 +93,6 @@ public class Guild {
             MineGuildPlugin.inst().getProxy().getPluginManager().callEvent((Event) gEvent);
 
             MineGuildPlugin.inst().getLogger().info("New Level UP Guild " + this.guildName);
-            if (this.guildLevel == maxLevel) {
-                this.guildExperience = 0L;
-                return;
-            }
             addExperience(nextExp);
         } else {
             this.guildExperience = round_exp(this.guildExperience + data, 2);
@@ -129,8 +131,10 @@ public class Guild {
             multi = 1.44;
         } else if (this.guildLevel <= 29) {
             multi = 1.64;
-        } else {
+        } else if (this.guildLevel <= 45) {
             multi = 1.94;
+        } else {
+            multi = 2.51;
         }
         return (base ^ this.guildLevel) * multi * this.guildLevel;
     }
