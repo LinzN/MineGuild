@@ -133,8 +133,10 @@ public class Guild {
             multi = 1.64;
         } else if (this.guildLevel <= 45) {
             multi = 1.94;
-        } else {
+        } else if (this.guildLevel <= 59) {
             multi = 2.51;
+        } else {
+            multi = 3.00;
         }
         return (base ^ this.guildLevel) * multi * this.guildLevel;
     }
