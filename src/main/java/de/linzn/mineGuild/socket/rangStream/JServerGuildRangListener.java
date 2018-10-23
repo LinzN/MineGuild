@@ -13,6 +13,7 @@ package de.linzn.mineGuild.socket.rangStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
+import de.linzn.mineGuild.manager.GuildManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -29,8 +30,12 @@ public class JServerGuildRangListener implements IncomingDataListener {
         try {
             subChannel = in.readUTF();
 
-            if (subChannel.equalsIgnoreCase("test")) {
+            if (subChannel.equalsIgnoreCase("guild_rang_setplayer")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                String playerName = in.readUTF();
+                String rangName = in.readUTF();
 
+                GuildManager.setPlayerRANG(actorUUID, playerName, rangName);
                 return;
             }
 

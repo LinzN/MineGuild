@@ -56,14 +56,6 @@ public class JServerGuildEditListener implements IncomingDataListener {
                 GuildManager.setGuildHome(actorUUID, location);
                 return;
             }
-            if (subChannel.equalsIgnoreCase("guild_edit_setrang_player")) {
-                UUID actorUUID = UUID.fromString(in.readUTF());
-                String playerName = in.readUTF();
-                String rangName = in.readUTF();
-
-                GuildManager.setPlayerRANG(actorUUID, playerName, rangName);
-                return;
-            }
 
 
         } catch (IOException e1) {
