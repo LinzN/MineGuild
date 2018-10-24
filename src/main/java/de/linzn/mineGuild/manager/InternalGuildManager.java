@@ -56,7 +56,7 @@ public class InternalGuildManager {
             MineGuildPlugin.inst().getLogger().info("Build JSONObject for " + guild.guildUUID.toString());
             JServerGuildControlOutput.send_guild_packet(serverName, jsonObject);
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

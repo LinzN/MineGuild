@@ -38,8 +38,24 @@ public class JServerGuildRangListener implements IncomingDataListener {
                 GuildManager.setPlayerRANG(actorUUID, playerName, rangName);
                 return;
             }
-
-
+            if (subChannel.equalsIgnoreCase("guild_rang_show_rang_info")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                String rangName = in.readUTF();
+                GuildManager.showRangInfo(actorUUID, rangName);
+                return;
+            }
+            if (subChannel.equalsIgnoreCase("guild_rang_show_player_rang")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                String playerName = in.readUTF();
+                GuildManager.showPlayerRang(actorUUID, playerName);
+                return;
+            }
+            if (subChannel.equalsIgnoreCase("guild_rang_show_list")) {
+                UUID actorUUID = UUID.fromString(in.readUTF());
+                int page = in.readInt();
+                GuildManager.showGuildRangList(actorUUID, page);
+                return;
+            }
         } catch (IOException e1) {
             e1.printStackTrace();
         }

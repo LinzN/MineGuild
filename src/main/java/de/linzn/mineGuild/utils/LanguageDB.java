@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatColor;
 public class LanguageDB {
     /* Error */
     public static String you_not_in_guild = ChatColor.DARK_RED + "Du bist in keiner Gilde!";
+    public static String player_not_in_guild = ChatColor.DARK_RED + "Dieser Spieler ist in keiner Gilde!";
     public static String you_already_in_guild = ChatColor.DARK_RED + "Du bist bereits in einer Gilde!";
     public static String you_no_guild_perm = ChatColor.DARK_RED + "Du hast für diese Aktion keine Berechtigung!";
     public static String player_not_online = ChatColor.DARK_RED + "Dieser Spieler ist nicht online!";
@@ -61,4 +62,19 @@ public class LanguageDB {
 
     public static String interface_guildlist_header = ChatColor.GOLD + "-====================[" + ChatColor.DARK_GREEN + "Gilden" + ChatColor.GOLD + "]====================-";
     public static String interface_guildlist_entry = ChatColor.GREEN + "Gilde: " + ChatColor.YELLOW + "{guildName} " + ChatColor.GREEN + " Mitglieder: " + ChatColor.YELLOW + "{memberSize} " + ChatColor.GREEN + " Level: " + ChatColor.YELLOW + "{level}";
+
+
+    public static String interface_ranginfo_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Rang Info" + ChatColor.GOLD + "]===================-";
+    public static String interface_ranginfo_rangname = ChatColor.GREEN + "Rangname: " + ChatColor.YELLOW + "{rangname}";
+    public static String interface_ranginfo_ranguuid = ChatColor.GREEN + "Rang UUID: " + ChatColor.YELLOW + "{ranguuid}";
+    public static String interface_ranginfo_priotiry = ChatColor.GREEN + "Priority: " + ChatColor.YELLOW + "{priority}";
+    public static String interface_ranginfo_permissions = ChatColor.GREEN + "Permissions: " + ChatColor.YELLOW + "{permissions}";
+
+    public static String interface_ranglist_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Rang List" + ChatColor.GOLD + "]===================-";
+    public static String interface_ranglist_listEntry = ChatColor.GREEN + "Priority: " + ChatColor.YELLOW + "{priority}" + ChatColor.GREEN + " Rangname: " + ChatColor.YELLOW + "{rangname}";
+
+    public static String interface_playerinfo_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Player Info" + ChatColor.GOLD + "]===================-";
+    public static String interface_playerinfo_player = ChatColor.GREEN + "Spieler: " + ChatColor.YELLOW + "{player}";
+    public static String interface_playerinfo_guild = ChatColor.GREEN + "Gilde: " + ChatColor.YELLOW + "{guild}";
+    public static String interface_playerinfo_rangname = ChatColor.GREEN + "Gilden Rang: " + ChatColor.YELLOW + "{rangname}";
 }

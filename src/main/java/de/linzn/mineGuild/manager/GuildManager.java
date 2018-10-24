@@ -36,6 +36,76 @@ import java.util.concurrent.TimeUnit;
 
 public class GuildManager {
 
+    public static void showRangInfo(UUID actor, String rangName){
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+        GuildRang guildRang = guild.getGuildRang(rangName);
+        if (guildRang == null){
+            actorP.sendMessage(LanguageDB.not_a_guild_rang);
+            return;
+        }
+
+        actorP.sendMessage(LanguageDB.interface_ranginfo_header);
+        actorP.sendMessage(LanguageDB.interface_ranginfo_rangname.replace("{rangname}", guildRang.rangName));
+        actorP.sendMessage(LanguageDB.interface_ranginfo_ranguuid.replace("{ranguuid}", guildRang.rangUUID.toString()));
+        actorP.sendMessage(LanguageDB.interface_ranginfo_priotiry.replace("{priority}", "" + guildRang.priority));
+        StringBuilder permissions = new StringBuilder();
+        permissions.append("[");
+        int i = 1;
+        for (GuildPermission guildPermission : guildRang.permissions){
+            permissions.append(guildPermission.name());
+            if (i < guildRang.permissions.size()){
+                permissions.append(", ");
+            }
+            i++;
+        }
+        permissions.append("]");
+        actorP.sendMessage(LanguageDB.interface_ranginfo_permissions.replace("{permissions}", permissions.toString()));
+    }
+
+    public static void showPlayerRang(UUID actor, String playerName){
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        UUID targetUUID = BungeeQuery.getUUID(playerName);
+
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(targetUUID);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.player_not_in_guild);
+            return;
+        }
+        String targetName = BungeeQuery.getPlayerName(targetUUID);
+
+        Guild guild = guildPlayer.getGuild();
+        GuildRang guildRang = guildPlayer.getGuildRang();
+
+        actorP.sendMessage(LanguageDB.interface_playerinfo_header);
+        actorP.sendMessage(LanguageDB.interface_playerinfo_player.replace("{player}", targetName));
+        actorP.sendMessage(LanguageDB.interface_playerinfo_guild.replace("{guild}", guild.guildName));
+        actorP.sendMessage(LanguageDB.interface_playerinfo_rangname.replace("{rangname}", guildRang.rangName));
+    }
+
+    public static void showGuildRangList(UUID actor, int page){
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
+
+        if (guildPlayer == null) {
+            actorP.sendMessage(LanguageDB.you_not_in_guild);
+            return;
+        }
+        Guild guild = guildPlayer.getGuild();
+
+        actorP.sendMessage(LanguageDB.interface_ranglist_header);
+        for (GuildRang guildRang : guild.guildRangs){
+            actorP.sendMessage(LanguageDB.interface_ranglist_listEntry.replace("{priority}", "" + guildRang.priority).replace("{rangname}", guildRang.rangName));
+        }
+    }
+
     public static void setGuildHome(UUID actor, Location location) {
         ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
         GuildPlayer guildPlayer = GuildDatabase.getGuildPlayer(actor);
@@ -52,9 +122,7 @@ public class GuildManager {
         }
 
         guild.set_guild_home(location);
-        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> {
-            GuildQuery.set_guild_home(guild.guildUUID, location);
-        });
+        ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> GuildQuery.set_guild_home(guild.guildUUID, location));
         guild.broadcastInGuild(LanguageDB.guild_new_Home.replace("{actor}", actorP.getName()));
     }
 
