@@ -83,7 +83,7 @@ public class InternalGuildManager {
         int counter = 0;
         while (!GuildDatabase.waitingGuildConfirms.get(playerUUID).getValue().get()) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(70);
             } catch (InterruptedException ignored) {
             }
             if (counter >= 100) { /* 5000 ms cancel task */
