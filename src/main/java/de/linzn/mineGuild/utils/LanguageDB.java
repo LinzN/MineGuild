@@ -28,10 +28,11 @@ public class LanguageDB {
     public static String you_kicked_from_guild = ChatColor.YELLOW + "Du wurdest von {actor} aus der Gilde entfernt!";
     public static String no_entries_on_page = ChatColor.RED + "Es wurden hier keine Einträge gefunden!";
     public static String guild_transaction = ChatColor.YELLOW + "Versuche Transaktion..";
+    public static String waiting_command = ChatColor.YELLOW + "Bitte versuche es gleich nochmal...";
 
     /* Guild broadcast */
     public static String guild_get_guild_invitation = ChatColor.GREEN + "Es wurde " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "in die Gilde eingeladen sich dieser anzuschliesen!";
-    public static String guild_create_guild = ChatColor.GREEN + "Spieler " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "hat die Gilde " + ChatColor.YELLOW + "{guild} " + ChatColor.GREEN + " erstellt!";
+    public static String guild_create_guild = ChatColor.GREEN + "Spieler " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "hat die Gilde " + ChatColor.YELLOW + "{guild} " + ChatColor.GREEN + "erstellt!";
     public static String guild_remove_guild = ChatColor.GOLD + "Spieler " + ChatColor.YELLOW + "{player} " + ChatColor.GOLD + "hat die Gilde " + ChatColor.YELLOW + "{guild} " + ChatColor.GOLD + "aufgelöst!";
     public static String guild_remove_guild_members = ChatColor.RED + "Eure Gilde wurde aufgelöst!";
     public static String guild_new_member = ChatColor.GREEN + "Spieler " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + "hat sich der Gilde angeschlossen. Willkommen!";

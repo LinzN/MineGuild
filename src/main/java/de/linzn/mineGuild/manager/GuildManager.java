@@ -489,6 +489,11 @@ public class GuildManager {
             return;
         }
 
+        if (InternalGuildManager.hasPendingConfirm(guildPlayer.getUUID())){
+            player.sendMessage(LanguageDB.waiting_command);
+            return;
+        }
+
         if (!InternalGuildManager.waitForGuildConfirm(guildPlayer.getUUID(), guild.guildUUID)){
             player.sendMessage(LanguageDB.guild_action_canceled);
             return;

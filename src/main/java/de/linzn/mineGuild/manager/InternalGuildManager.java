@@ -67,13 +67,17 @@ public class InternalGuildManager {
 
     }
 
+    public static boolean hasPendingConfirm(UUID playerUUID){
+        return GuildDatabase.waitingGuildConfirms.containsKey(playerUUID);
+    }
+
     public static boolean waitForGuildConfirm(UUID playerUUID, UUID guildUUID) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
         if (player == null){
             return false;
         }
         String server = player.getServer().getInfo().getName();
-        MineSuiteBungeePlugin.getInstance().getLogger().info("Request guild action comfirm!");
+        MineSuiteBungeePlugin.getInstance().getLogger().info("Request guild action confirm!");
         GuildDatabase.waitingGuildConfirms.put(playerUUID, new MinePair<>(guildUUID, new AtomicBoolean(false)));
         JServerGuildControlOutput.request_guild_action_confirm(server, playerUUID, guildUUID);
         int counter = 0;
