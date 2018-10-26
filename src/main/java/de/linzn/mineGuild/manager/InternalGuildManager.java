@@ -1,6 +1,5 @@
 package de.linzn.mineGuild.manager;
 
-import com.google.gson.JsonObject;
 import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.database.mysql.GuildQuery;
@@ -9,11 +8,7 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
-import de.linzn.mineSuite.bungee.database.DataHashTable;
-import de.linzn.mineSuite.bungee.module.core.socket.JServerBungeeOutput;
-import de.linzn.mineSuite.bungee.utils.FakePair;
-import de.linzn.mineSuite.bungee.utils.MessageDB;
-import javafx.util.Pair;
+import de.linzn.mineSuite.bungee.utils.MinePair;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONArray;
@@ -79,7 +74,7 @@ public class InternalGuildManager {
         }
         String server = player.getServer().getInfo().getName();
         MineSuiteBungeePlugin.getInstance().getLogger().info("Request guild action comfirm!");
-        GuildDatabase.waitingGuildConfirms.put(playerUUID, new Pair<>(guildUUID, new AtomicBoolean(false)));
+        GuildDatabase.waitingGuildConfirms.put(playerUUID, new MinePair<>(guildUUID, new AtomicBoolean(false)));
         JServerGuildControlOutput.request_guild_action_confirm(server, playerUUID, guildUUID);
         int counter = 0;
         while (!GuildDatabase.waitingGuildConfirms.get(playerUUID).getValue().get()) {
