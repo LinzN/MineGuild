@@ -489,6 +489,11 @@ public class GuildManager {
             return;
         }
 
+        if (!InternalGuildManager.waitForGuildConfirm(guildPlayer.getUUID(), guild.guildUUID)){
+            player.sendMessage(LanguageDB.guild_action_canceled);
+            return;
+        }
+
         if (remove_guild(guildPlayer.getGuild().guildUUID, actor)) {
             player.sendMessage(LanguageDB.you_remove_guild.replace("{guild}", guildName));
             guild.broadcastInGuild(LanguageDB.guild_remove_guild_members);

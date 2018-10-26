@@ -13,6 +13,7 @@ package de.linzn.mineGuild.socket.controlStream;
 
 
 import de.linzn.jSocket.core.IncomingDataListener;
+import de.linzn.mineGuild.database.GuildDatabase;
 import de.linzn.mineGuild.manager.InternalGuildManager;
 
 import java.io.ByteArrayInputStream;
@@ -33,6 +34,18 @@ public class JServerGuildControlListener implements IncomingDataListener {
             if (subChannel.equalsIgnoreCase("request_all_guild_data")) {
                 String serverName = in.readUTF();
                 InternalGuildManager.server_data_request(serverName);
+                return;
+            }
+
+            if (subChannel.equalsIgnoreCase("confirm_guild_action")) {
+                UUID playerUUID = UUID.fromString(in.readUTF());
+                UUID guildUUID = UUID.fromString(in.readUTF());
+
+                if (GuildDatabase.waitingGuildConfirms.containsKey(playerUUID)){
+                    if (GuildDatabase.waitingGuildConfirms.get(playerUUID).getKey().equals(guildUUID)) {
+                        GuildDatabase.waitingGuildConfirms.get(playerUUID).getValue().set(true);
+                    }
+                }
                 return;
             }
 

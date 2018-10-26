@@ -8,12 +8,20 @@ import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
+import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
+import de.linzn.mineSuite.bungee.database.DataHashTable;
+import de.linzn.mineSuite.bungee.module.core.socket.JServerBungeeOutput;
+import de.linzn.mineSuite.bungee.utils.FakePair;
+import de.linzn.mineSuite.bungee.utils.MessageDB;
+import javafx.util.Pair;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalGuildManager {
     public static void migrate_guild_data() {
@@ -62,6 +70,32 @@ public class InternalGuildManager {
             }
         }
 
+    }
+
+    public static boolean waitForGuildConfirm(UUID playerUUID, UUID guildUUID) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+        if (player == null){
+            return false;
+        }
+        String server = player.getServer().getInfo().getName();
+        MineSuiteBungeePlugin.getInstance().getLogger().info("Request guild action comfirm!");
+        GuildDatabase.waitingGuildConfirms.put(playerUUID, new Pair<>(guildUUID, new AtomicBoolean(false)));
+        JServerGuildControlOutput.request_guild_action_confirm(server, playerUUID, guildUUID);
+        int counter = 0;
+        while (!GuildDatabase.waitingGuildConfirms.get(playerUUID).getValue().get()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ignored) {
+            }
+            if (counter >= 100) { /* 5000 ms cancel task */
+                GuildDatabase.waitingGuildConfirms.remove(playerUUID);
+                return false;
+            }
+            counter++;
+        }
+        MineSuiteBungeePlugin.getInstance().getLogger().info("Confirm guild action ok");
+        GuildDatabase.waitingGuildConfirms.remove(playerUUID);
+        return true;
     }
 
 }

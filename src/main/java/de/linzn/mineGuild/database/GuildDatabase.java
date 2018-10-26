@@ -15,15 +15,18 @@ package de.linzn.mineGuild.database;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
+import javafx.util.Pair;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuildDatabase {
     private static HashMap<UUID, Guild> guilds = new HashMap<>();
     private static HashMap<UUID, UUID> pendingInvites = new HashMap<>();
+    public static HashMap<UUID, Pair<UUID, AtomicBoolean>> waitingGuildConfirms = new HashMap<>();
 
     public static GuildPlayer getGuildPlayer(String playerName) {
         UUID playerUUID = null;

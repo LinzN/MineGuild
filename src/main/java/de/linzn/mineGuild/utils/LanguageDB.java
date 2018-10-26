@@ -19,6 +19,7 @@ public class LanguageDB {
     public static String you_can_not_leave_guild = ChatColor.DARK_RED + "Du kannst die Gilde so nicht verlassen. Bist du Gildenmeister?";
     public static String database_error = "" + ChatColor.DARK_RED + ChatColor.BOLD + "Es ist ein Datenbankfehler aufgetreten. Bitte an ein Teammitglied wenden!";
     public static String not_a_guild_rang = ChatColor.DARK_RED + "Diesen Rang existiert nicht!";
+    public static String guild_action_canceled = ChatColor.DARK_RED + "Gildenaktion wurde abgebrochen!";
 
     /* Info */
     public static String guild_invitation_expired = ChatColor.YELLOW + "Die Einladung ist abgelaufen!";
@@ -52,9 +53,9 @@ public class LanguageDB {
     /* Interface Info*/
     public static String interface_guildinfo_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Gilden Info" + ChatColor.GOLD + "]===================-";
     public static String interface_guildinfo_name = ChatColor.GREEN + "Name: " + ChatColor.YELLOW + "{guild}";
-    public static String interface_guildinfo_membersize = ChatColor.GREEN + "Mitgliederstärke: " + ChatColor.YELLOW + "{guild_size}";
-    public static String interface_guildinfo_guildlevel = ChatColor.GREEN + "Gildenlevel: " + ChatColor.YELLOW + "{guild_level}";
-    public static String interface_guildinfo_balance = ChatColor.GREEN + "Balance: " + ChatColor.YELLOW + "{balance} Mines";
+    public static String interface_guildinfo_membersize = ChatColor.GREEN + "Mitglieder: " + ChatColor.YELLOW + "{guild_size}";
+    public static String interface_guildinfo_guildlevel = ChatColor.GREEN + "Level: " + ChatColor.YELLOW + "{guild_level}";
+    public static String interface_guildinfo_balance = ChatColor.GREEN + "Konto: " + ChatColor.YELLOW + "{balance} Mines";
     public static String interface_guildinfo_guildexperience = ChatColor.GREEN + "Erfahrung: " + ChatColor.YELLOW + "{exp}/{totalExp}";
 
     public static String interface_guildmembers_header = ChatColor.GOLD + "-===============[" + ChatColor.DARK_GREEN + "Gilden Mitglieder" + ChatColor.GOLD + "]===============-";
@@ -65,16 +66,16 @@ public class LanguageDB {
 
 
     public static String interface_ranginfo_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Rang Info" + ChatColor.GOLD + "]===================-";
-    public static String interface_ranginfo_rangname = ChatColor.GREEN + "Rangname: " + ChatColor.YELLOW + "{rangname}";
-    public static String interface_ranginfo_ranguuid = ChatColor.GREEN + "Rang UUID: " + ChatColor.YELLOW + "{ranguuid}";
-    public static String interface_ranginfo_priotiry = ChatColor.GREEN + "Priority: " + ChatColor.YELLOW + "{priority}";
-    public static String interface_ranginfo_permissions = ChatColor.GREEN + "Permissions: " + ChatColor.YELLOW + "{permissions}";
+    public static String interface_ranginfo_rangname = ChatColor.GREEN + "Rang: " + ChatColor.YELLOW + "{rangname}";
+    public static String interface_ranginfo_ranguuid = ChatColor.GREEN + "UUID: " + ChatColor.YELLOW + "{ranguuid}";
+    public static String interface_ranginfo_priotiry = ChatColor.GREEN + "Priorität: " + ChatColor.YELLOW + "{priority}";
+    public static String interface_ranginfo_permissions = ChatColor.GREEN + "Rechte: " + ChatColor.YELLOW + "{permissions}";
 
-    public static String interface_ranglist_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Rang List" + ChatColor.GOLD + "]===================-";
-    public static String interface_ranglist_listEntry = ChatColor.GREEN + "Priority: " + ChatColor.YELLOW + "{priority}" + ChatColor.GREEN + " Rangname: " + ChatColor.YELLOW + "{rangname}";
+    public static String interface_ranglist_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Rang Liste" + ChatColor.GOLD + "]===================-";
+    public static String interface_ranglist_listEntry = ChatColor.GREEN + "Priorität: " + ChatColor.YELLOW + "{priority}" + ChatColor.GREEN + " Rang: " + ChatColor.YELLOW + "{rangname}";
 
     public static String interface_playerinfo_header = ChatColor.GOLD + "-===================[" + ChatColor.DARK_GREEN + "Player Info" + ChatColor.GOLD + "]===================-";
     public static String interface_playerinfo_player = ChatColor.GREEN + "Spieler: " + ChatColor.YELLOW + "{player}";
     public static String interface_playerinfo_guild = ChatColor.GREEN + "Gilde: " + ChatColor.YELLOW + "{guild}";
-    public static String interface_playerinfo_rangname = ChatColor.GREEN + "Gilden Rang: " + ChatColor.YELLOW + "{rangname}";
+    public static String interface_playerinfo_rangname = ChatColor.GREEN + "Rang: " + ChatColor.YELLOW + "{rangname}";
 }
