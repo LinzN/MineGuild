@@ -15,7 +15,7 @@ package de.linzn.mineGuild.database;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
-import de.linzn.mineSuite.bungee.utils.MinePair;
+import de.linzn.openJL.pairs.EditablePair;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GuildDatabase {
     private static HashMap<UUID, Guild> guilds = new HashMap<>();
     private static HashMap<UUID, UUID> pendingInvites = new HashMap<>();
-    public static HashMap<UUID, MinePair<UUID, AtomicBoolean>> waitingGuildConfirms = new HashMap<>();
+    public static HashMap<UUID, EditablePair<UUID, AtomicBoolean>> waitingGuildConfirms = new HashMap<>();
 
     public static GuildPlayer getGuildPlayer(String playerName) {
         UUID playerUUID = null;

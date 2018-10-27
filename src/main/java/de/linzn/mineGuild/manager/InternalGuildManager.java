@@ -8,7 +8,7 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
-import de.linzn.mineSuite.bungee.utils.MinePair;
+import de.linzn.openJL.pairs.EditablePair;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONArray;
@@ -78,10 +78,10 @@ public class InternalGuildManager {
         }
         String server = player.getServer().getInfo().getName();
         MineSuiteBungeePlugin.getInstance().getLogger().info("Request guild action confirm!");
-        GuildDatabase.waitingGuildConfirms.put(playerUUID, new MinePair<>(guildUUID, new AtomicBoolean(false)));
+        GuildDatabase.waitingGuildConfirms.put(playerUUID, new EditablePair<>(guildUUID, new AtomicBoolean(false)));
         JServerGuildControlOutput.request_guild_action_confirm(server, playerUUID, guildUUID);
         int counter = 0;
-        while (!GuildDatabase.waitingGuildConfirms.get(playerUUID).getValue().get()) {
+        while (!GuildDatabase.waitingGuildConfirms.get(playerUUID).getRight().get()) {
             try {
                 Thread.sleep(70);
             } catch (InterruptedException ignored) {
