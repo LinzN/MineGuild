@@ -14,10 +14,8 @@ package de.linzn.mineGuild.socket.updateStream;
 
 import de.linzn.jSocket.core.IncomingDataListener;
 import de.linzn.mineGuild.manager.InternalGuildManager;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -35,7 +33,7 @@ public class JServerGuildUpdateListener implements IncomingDataListener {
             subChannel = in.readUTF();
             if (subChannel.equalsIgnoreCase("add_experience_sync")) {
                 JSONArray jsonArray = new JSONArray(in.readUTF());
-                for (Object object : jsonArray){
+                for (Object object : jsonArray) {
                     JSONObject jsonObject = (JSONObject) object;
                     UUID guildUUID = UUID.fromString(jsonObject.getString("guildUUID"));
                     double data = jsonObject.getDouble("guildExperience");

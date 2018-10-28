@@ -13,6 +13,7 @@ public class ConnectionListener implements Listener {
     public void onPlayerQuite(PlayerDisconnectEvent event) {
         GuildDatabase.removeGuildInvitation(event.getPlayer().getUniqueId());
     }
+
     @EventHandler
     public void onGuildLevelUp(GuildLevelUpEvent event) {
         Guild guild = event.getGuild();

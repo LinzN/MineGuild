@@ -14,6 +14,7 @@ package de.linzn.mineGuild.objects;
 
 import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.api.events.GuildLevelUpEvent;
+import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -93,6 +94,7 @@ public class Guild {
             MineGuildPlugin.inst().getProxy().getPluginManager().callEvent((Event) gEvent);
 
             MineGuildPlugin.inst().getLogger().info("New Level UP Guild " + this.guildName);
+            JServerGuildUpdateOutput.update_guild(this);
             addExperience(nextExp);
         } else {
             this.guildExperience = round_exp(this.guildExperience + data, 2);

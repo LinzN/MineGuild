@@ -6,7 +6,6 @@ import de.linzn.mineGuild.database.mysql.GuildQuery;
 import de.linzn.mineGuild.objects.Guild;
 import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.socket.controlStream.JServerGuildControlOutput;
-import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 import de.linzn.openJL.pairs.EditablePair;
 import net.md_5.bungee.api.ProxyServer;
@@ -23,7 +22,7 @@ public class InternalGuildManager {
         HashSet<Guild> old_guilds = GuildQuery.load_old_database_guilds();
         for (Guild guild : old_guilds) {
             GuildQuery.setGuild(guild);
-            JServerGuildUpdateOutput.send_plugin_migrate(guild.guildUUID, guild.guildName);
+            JServerGuildControlOutput.send_plugin_migrate(guild.guildUUID, guild.guildName);
             MineGuildPlugin.inst().getLogger().info("Migrate guild " + guild.guildUUID);
         }
         GuildManager.loadData();
@@ -41,7 +40,7 @@ public class InternalGuildManager {
     }
 
 
-    public static void server_data_request(String serverName){
+    public static void server_data_request(String serverName) {
         MineGuildPlugin.inst().getLogger().info("Request guild_data for server " + serverName);
         HashSet<Guild> guilds = new HashSet<>(GuildDatabase.getGuilds());
 
@@ -52,7 +51,7 @@ public class InternalGuildManager {
             jsonObject.put("guildLevel", guild.guildLevel);
 
             JSONArray jsonArray = new JSONArray();
-            for (GuildPlayer guildPlayer : guild.guildPlayers){
+            for (GuildPlayer guildPlayer : guild.guildPlayers) {
                 jsonArray.put(guildPlayer.getUUID().toString());
             }
             jsonObject.put("guildMembers", jsonArray);
@@ -67,13 +66,13 @@ public class InternalGuildManager {
 
     }
 
-    public static boolean hasPendingConfirm(UUID playerUUID){
+    public static boolean hasPendingConfirm(UUID playerUUID) {
         return GuildDatabase.waitingGuildConfirms.containsKey(playerUUID);
     }
 
     public static boolean waitForGuildConfirm(UUID playerUUID, UUID guildUUID) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
-        if (player == null){
+        if (player == null) {
             return false;
         }
         String server = player.getServer().getInfo().getName();

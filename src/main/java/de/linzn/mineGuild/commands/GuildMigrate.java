@@ -9,14 +9,14 @@ import net.md_5.bungee.api.plugin.Command;
 
 import java.util.concurrent.TimeUnit;
 
-public class GuildMigrate  extends Command {
+public class GuildMigrate extends Command {
     public GuildMigrate(String name) {
         super(name);
     }
 
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
-        if (commandSender instanceof ProxiedPlayer){
+        if (commandSender instanceof ProxiedPlayer) {
             commandSender.sendMessage("No CONSOLE!");
             return;
         }

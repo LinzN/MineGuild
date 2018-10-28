@@ -24,9 +24,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuildDatabase {
+    public static HashMap<UUID, EditablePair<UUID, AtomicBoolean>> waitingGuildConfirms = new HashMap<>();
     private static HashMap<UUID, Guild> guilds = new HashMap<>();
     private static HashMap<UUID, UUID> pendingInvites = new HashMap<>();
-    public static HashMap<UUID, EditablePair<UUID, AtomicBoolean>> waitingGuildConfirms = new HashMap<>();
 
     public static GuildPlayer getGuildPlayer(String playerName) {
         UUID playerUUID = null;

@@ -40,7 +40,7 @@ public class JServerGuildControlListener implements IncomingDataListener {
             if (subChannel.equalsIgnoreCase("confirm_guild_action")) {
                 UUID playerUUID = UUID.fromString(in.readUTF());
                 UUID guildUUID = UUID.fromString(in.readUTF());
-                if (GuildDatabase.waitingGuildConfirms.containsKey(playerUUID)){
+                if (GuildDatabase.waitingGuildConfirms.containsKey(playerUUID)) {
                     if (GuildDatabase.waitingGuildConfirms.get(playerUUID).getLeft().equals(guildUUID)) {
                         GuildDatabase.waitingGuildConfirms.get(playerUUID).getRight().set(true);
                     }
