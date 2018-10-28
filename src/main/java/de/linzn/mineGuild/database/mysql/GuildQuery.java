@@ -110,8 +110,8 @@ public class GuildQuery {
             PreparedStatement insert = null;
             for (GuildRang guildRang : guild.guildRangs) {
                 insert = conn
-                        .prepareStatement("INSERT INTO guild_rang (rang_uuid, guild_uuid, rang_name, rang_priority) VALUES ('" + guildRang.rangUUID.toString() + "', '"
-                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "', '" + guildRang.priority + "');");
+                        .prepareStatement("INSERT INTO guild_rang (rang_uuid, guild_uuid, rang_name, rang_priority, rang_fixed) VALUES ('" + guildRang.rangUUID.toString() + "', '"
+                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "', '" + guildRang.priority + "', '" + guildRang.fixed + "');");
                 insert.executeUpdate();
                 private_set_rang_permissions(guildRang);
             }
@@ -327,13 +327,14 @@ public class GuildQuery {
         try {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement sql = conn.prepareStatement(
-                    "SELECT rang_uuid, rang_name, rang_priority FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
+                    "SELECT rang_uuid, rang_name, rang_fixed, rang_priority FROM guild_rang WHERE guild_uuid = '" + guildUUID.toString() + "';");
             ResultSet result = sql.executeQuery();
             while (result.next()) {
                 UUID rang_uuid = UUID.fromString(result.getString("rang_uuid"));
                 String rang_name = result.getString("rang_name");
                 int rang_priority = result.getInt("rang_priority");
-                GuildRang guildRang = new GuildRang(rang_name, rang_uuid, rang_priority);
+                boolean rang_fixed = result.getBoolean("rang_fixed");
+                GuildRang guildRang = new GuildRang(rang_name, rang_uuid, rang_priority, rang_fixed);
                 ArrayList<GuildPermission> permissions = private_get_rang_permission(rang_uuid);
                 for (GuildPermission permission : permissions) {
                     guildRang.setPermission(permission);
@@ -547,9 +548,9 @@ public class GuildQuery {
                 }
                 result.close();
 
-                GuildRang memberRang = GuildManager.getDefaultRang("static_member");
+                GuildRang memberRang = GuildManager.getDefaultRang("member");
                 GuildRang assistantRang = GuildManager.getDefaultRang("assistant");
-                GuildRang masterRang = GuildManager.getDefaultRang("static_master");
+                GuildRang masterRang = GuildManager.getDefaultRang("master");
 
                 guild.set_guild_rang(masterRang);
                 guild.set_guild_rang(assistantRang);

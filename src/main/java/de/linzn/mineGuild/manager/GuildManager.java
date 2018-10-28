@@ -157,8 +157,8 @@ public class GuildManager {
             return;
         }
 
-        GuildRang masterRang = guild.getGuildRang("static_master");
-        GuildRang memberRang = guild.getGuildRang("static_member");
+        GuildRang masterRang = guild.getGuildRang("master");
+        GuildRang memberRang = guild.getGuildRang("member");
 
         newMaster.setRangUUID(masterRang.rangUUID);
         guildPlayer.setRangUUID(memberRang.rangUUID);
@@ -202,7 +202,7 @@ public class GuildManager {
             actorP.sendMessage(LanguageDB.player_action_not_possible);
             return;
         }
-        GuildRang masterRang = guild.getGuildRang("static_master");
+        GuildRang masterRang = guild.getGuildRang("master");
 
         if (targetGuildPlayer.getGuildRang() == masterRang) {
             actorP.sendMessage(LanguageDB.player_action_not_possible);
@@ -240,11 +240,6 @@ public class GuildManager {
 
         if (!guild.hasPermission(guildPlayer, GuildPermission.SETGUILDNAME)) {
             actorP.sendMessage(LanguageDB.you_no_guild_perm);
-            return;
-        }
-
-        if (!PluginUtil.check_guild_name(guildName)){
-            actorP.sendMessage(LanguageDB.no_valid_guildname);
             return;
         }
 
@@ -318,7 +313,7 @@ public class GuildManager {
             return;
         }
 
-        if (guildPlayer.getGuildRang().rangName.equalsIgnoreCase("static_master")) {
+        if (guildPlayer.getGuildRang().rangName.equalsIgnoreCase("master")) {
             actorP.sendMessage(LanguageDB.you_can_not_leave_guild);
             return;
         }
@@ -406,7 +401,7 @@ public class GuildManager {
             return;
         }
 
-        if (kickedGuildPlayer.getGuildRang().rangName.equalsIgnoreCase("static_master")) {
+        if (kickedGuildPlayer.getGuildRang().rangName.equalsIgnoreCase("master")) {
             actorP.sendMessage(LanguageDB.player_action_not_possible);
             return;
         }
@@ -471,11 +466,6 @@ public class GuildManager {
         }
         if (GuildDatabase.getGuildPlayer(creator) != null) {
             player.sendMessage(LanguageDB.you_already_in_guild);
-            return;
-        }
-
-        if (!PluginUtil.check_guild_name(guildName)){
-            player.sendMessage(LanguageDB.no_valid_guildname);
             return;
         }
 
@@ -604,11 +594,11 @@ public class GuildManager {
         Guild guild = new Guild(guildName, guildUUID);
 
         /* Set default rang */
-        GuildRang masterRang = getDefaultRang("static_master");
+        GuildRang masterRang = getDefaultRang("master");
         guild.set_guild_rang(masterRang);
         GuildRang assistantRang = getDefaultRang("assistant");
         guild.set_guild_rang(assistantRang);
-        GuildRang memberRang = getDefaultRang("static_member");
+        GuildRang memberRang = getDefaultRang("member");
         guild.set_guild_rang(memberRang);
 
         /* Set master */
@@ -669,7 +659,7 @@ public class GuildManager {
             return false;
         }
         GuildPlayer guildPlayer = new GuildPlayer(invitedPlayer.getUniqueId());
-        guildPlayer.setRangUUID(guild.getGuildRang("static_member").rangUUID);
+        guildPlayer.setRangUUID(guild.getGuildRang("member").rangUUID);
         guildPlayer.setGuild(guild);
         guild.addGuildPlayer(guildPlayer);
 
@@ -721,11 +711,11 @@ public class GuildManager {
 
     public static GuildRang getDefaultRang(String rangName) {
         GuildRang rang = null;
-        if (rangName.equalsIgnoreCase("static_master")) {
-            rang = new GuildRang("static_master", UUID.randomUUID(), -1);
+        if (rangName.equalsIgnoreCase("master")) {
+            rang = new GuildRang("master", UUID.randomUUID(), -1, true);
             rang.setPermission(GuildPermission.MASTERKEY);
         } else if (rangName.equalsIgnoreCase("assistant")) {
-            rang = new GuildRang("assistant", UUID.randomUUID(), 1);
+            rang = new GuildRang("assistant", UUID.randomUUID(), 1, false);
             rang.setPermission(GuildPermission.INVITE);
             rang.setPermission(GuildPermission.SETPLAYERRANG);
             rang.setPermission(GuildPermission.WITHDRAW);
@@ -737,8 +727,8 @@ public class GuildManager {
             rang.setPermission(GuildPermission.LEAVE);
             rang.setPermission(GuildPermission.CHAT);
             rang.setPermission(GuildPermission.DEPOSIT);
-        } else if (rangName.equalsIgnoreCase("static_member")) {
-            rang = new GuildRang("static_member", UUID.randomUUID(), 2);
+        } else if (rangName.equalsIgnoreCase("member")) {
+            rang = new GuildRang("member", UUID.randomUUID(), 2, true);
             rang.setPermission(GuildPermission.HOME);
             rang.setPermission(GuildPermission.HELP);
             rang.setPermission(GuildPermission.INFO);

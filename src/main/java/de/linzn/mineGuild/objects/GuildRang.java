@@ -18,13 +18,15 @@ public class GuildRang {
     public UUID rangUUID;
     public String rangName;
     public int priority;
+    public boolean fixed;
     public ArrayList<GuildPermission> permissions;
 
-    public GuildRang(String rangName, UUID rangUUID, int priority) {
+    public GuildRang(String rangName, UUID rangUUID, int priority, boolean fixed) {
         this.rangName = rangName.toUpperCase();
         this.rangUUID = rangUUID;
         this.priority = priority;
         this.permissions = new ArrayList<>();
+        this.fixed = fixed;
     }
 
     public boolean hasPermission(GuildPermission permission) {
