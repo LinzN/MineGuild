@@ -22,4 +22,19 @@ public class PluginUtil {
         long tmp = Math.round(value);
         return (double) tmp / factor;
     }
+
+    public static boolean check_guild_name(String guildName){
+        if (!Character.isLetter(guildName.charAt(0))){
+            return false;
+        }
+        if (guildName.length() < 3 || guildName.length() >= 20){
+            return false;
+        }
+        for (char c : guildName.toCharArray()) {
+            if (!Character.isLetterOrDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

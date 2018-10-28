@@ -243,6 +243,16 @@ public class GuildManager {
             return;
         }
 
+        if (!PluginUtil.check_guild_name(guildName)){
+            actorP.sendMessage(LanguageDB.no_valid_guildname);
+            return;
+        }
+
+        if (guild.guildName.equalsIgnoreCase(guildName)){
+            actorP.sendMessage(LanguageDB.same_guild_name);
+            return;
+        }
+
         guild.set_guild_name(guildName);
         guild.broadcastInGuild(LanguageDB.guild_change_name.replace("{actor}", actorP.getName()).replace("{guild}", guild.guildName));
 
@@ -401,6 +411,11 @@ public class GuildManager {
             return;
         }
 
+        if (kickedGuildPlayer.getGuildRang().priority <= guildPlayer.getGuildRang().priority) {
+            actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
         if (remove_player_from_guild(guild.guildUUID, kickedGuildPlayer.getUUID())) {
             guild.broadcastInGuild(LanguageDB.guild_kicked_player.replace("{actor}", actorP.getName()).replace("{player}", BungeeQuery.getPlayerName(kickedGuildPlayer.getUUID())));
             if (ProxyServer.getInstance().getPlayer(kickedPlayer) != null) {
@@ -435,16 +450,16 @@ public class GuildManager {
 
     /* Public guild deny invitation from ioStream */
     public static void denyInvitation(UUID actor) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(actor);
-        if (player == null) {
+        ProxiedPlayer actorP = ProxyServer.getInstance().getPlayer(actor);
+        if (actorP == null) {
             return;
         }
         if (!GuildDatabase.hasGuildInvitation(actor)) {
-            player.sendMessage(LanguageDB.you_no_open_invitations);
+            actorP.sendMessage(LanguageDB.you_no_open_invitations);
             return;
         }
         GuildDatabase.removeGuildInvitation(actor);
-        player.sendMessage(LanguageDB.you_deny_invitation);
+        actorP.sendMessage(LanguageDB.you_deny_invitation);
 
     }
 
@@ -456,6 +471,11 @@ public class GuildManager {
         }
         if (GuildDatabase.getGuildPlayer(creator) != null) {
             player.sendMessage(LanguageDB.you_already_in_guild);
+            return;
+        }
+
+        if (!PluginUtil.check_guild_name(guildName)){
+            player.sendMessage(LanguageDB.no_valid_guildname);
             return;
         }
 
@@ -709,6 +729,7 @@ public class GuildManager {
             rang.setPermission(GuildPermission.INVITE);
             rang.setPermission(GuildPermission.SETPLAYERRANG);
             rang.setPermission(GuildPermission.WITHDRAW);
+            rang.setPermission(GuildPermission.KICK);
 
             rang.setPermission(GuildPermission.HOME);
             rang.setPermission(GuildPermission.HELP);
