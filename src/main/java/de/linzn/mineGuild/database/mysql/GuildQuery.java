@@ -109,9 +109,13 @@ public class GuildQuery {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement insert = null;
             for (GuildRang guildRang : guild.guildRangs) {
+                int rang_fixed = 0;
+                if (guildRang.fixed){
+                    rang_fixed = 1;
+                }
                 insert = conn
                         .prepareStatement("INSERT INTO guild_rang (rang_uuid, guild_uuid, rang_name, rang_priority, rang_fixed) VALUES ('" + guildRang.rangUUID.toString() + "', '"
-                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "', '" + guildRang.priority + "', '" + guildRang.fixed + "');");
+                                + guild.guildUUID.toString() + "', '" + guildRang.rangName + "', '" + guildRang.priority + "', '" + rang_fixed + "');");
                 insert.executeUpdate();
                 private_set_rang_permissions(guildRang);
             }
@@ -333,7 +337,11 @@ public class GuildQuery {
                 UUID rang_uuid = UUID.fromString(result.getString("rang_uuid"));
                 String rang_name = result.getString("rang_name");
                 int rang_priority = result.getInt("rang_priority");
-                boolean rang_fixed = result.getBoolean("rang_fixed");
+                int fixed = result.getInt("rang_fixed");
+                boolean rang_fixed = false;
+                if (fixed == 1){
+                    rang_fixed = true;
+                }
                 GuildRang guildRang = new GuildRang(rang_name, rang_uuid, rang_priority, rang_fixed);
                 ArrayList<GuildPermission> permissions = private_get_rang_permission(rang_uuid);
                 for (GuildPermission permission : permissions) {
