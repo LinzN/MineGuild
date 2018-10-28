@@ -22,6 +22,7 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
 import de.linzn.mineGuild.utils.LanguageDB;
+import de.linzn.mineGuild.utils.PluginUtil;
 import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
 import de.linzn.mineSuite.bungee.module.chat.IChatChannel;
@@ -531,13 +532,14 @@ public class GuildManager {
         double requiredGuildExperience = guild.getGuildRequiredExperience();
         String server = player.getServer().getInfo().getName();
         double guildBalance = BungeeManager.request_balance(server, "guild_" + guild.guildUUID.toString());
-
+        double mcmmoShare = PluginUtil.get_mcmmo_multiplikator(guildLevel);
         player.sendMessage(LanguageDB.interface_guildinfo_header);
         player.sendMessage(LanguageDB.interface_guildinfo_name.replace("{guild}", guild.guildName));
         player.sendMessage(LanguageDB.interface_guildinfo_membersize.replace("{guild_size}", "" + size));
         player.sendMessage(LanguageDB.interface_guildinfo_guildlevel.replace("{guild_level}", "" + guildLevel));
         player.sendMessage(LanguageDB.interface_guildinfo_balance.replace("{balance}", "" + guildBalance));
         player.sendMessage(LanguageDB.interface_guildinfo_guildexperience.replace("{exp}", "" + guildExperience).replace("{totalExp}", "" + requiredGuildExperience));
+        player.sendMessage(LanguageDB.interface_guildinfo_xpshare.replace("{share}", "" + mcmmoShare));
     }
 
     /* Public show members of guild from ioStream */

@@ -58,6 +58,7 @@ public class LanguageDB {
     public static String interface_guildinfo_guildlevel = ChatColor.GREEN + "Level: " + ChatColor.YELLOW + "{guild_level}";
     public static String interface_guildinfo_balance = ChatColor.GREEN + "Konto: " + ChatColor.YELLOW + "{balance} Mines";
     public static String interface_guildinfo_guildexperience = ChatColor.GREEN + "Erfahrung: " + ChatColor.YELLOW + "{exp}/{totalExp}";
+    public static String interface_guildinfo_xpshare = ChatColor.GREEN + "mcMMO Share: " + ChatColor.YELLOW + "{share}";
 
     public static String interface_guildmembers_header = ChatColor.GOLD + "-===============[" + ChatColor.DARK_GREEN + "Gilden Mitglieder" + ChatColor.GOLD + "]===============-";
     public static String interface_guildmembers_entry = ChatColor.GREEN + "Spieler: " + ChatColor.YELLOW + "{player} " + ChatColor.GREEN + " Rang: " + ChatColor.YELLOW + "{rang}";

@@ -15,6 +15,7 @@ package de.linzn.mineGuild.objects;
 import de.linzn.mineGuild.MineGuildPlugin;
 import de.linzn.mineGuild.api.events.GuildLevelUpEvent;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
+import de.linzn.mineGuild.utils.PluginUtil;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -97,7 +98,7 @@ public class Guild {
             JServerGuildUpdateOutput.update_guild(this);
             addExperience(nextExp);
         } else {
-            this.guildExperience = round_exp(this.guildExperience + data, 2);
+            this.guildExperience = PluginUtil.round(this.guildExperience + data, 2);
         }
     }
 
@@ -152,13 +153,5 @@ public class Guild {
         }
     }
 
-    private double round_exp(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        long factor = (long) Math.pow(10, places);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
-    }
 
 }
