@@ -9,7 +9,7 @@ public class LanguageDB {
     public static String you_already_in_guild = ChatColor.DARK_RED + "Du bist bereits in einer Gilde!";
     public static String you_no_guild_perm = ChatColor.DARK_RED + "Du hast für diese Aktion keine Berechtigung!";
     public static String player_not_online = ChatColor.DARK_RED + "Dieser Spieler ist nicht online!";
-    public static String same_guild_name = ChatColor.DARK_RED + "Selber Gildenname??";
+    public static String same_guild_name = ChatColor.DARK_RED + "Das ist doch der selbe Gildennamen. Lass dir was besseres einfallen :D";
     public static String player_action_not_possible = ChatColor.DARK_RED + "Dies ist mit diesem Spieler nicht möglich!";
     public static String you_no_open_invitations = ChatColor.DARK_RED + "Du hast keine offenen Einladungen!";
     public static String player_already_in_guild = ChatColor.DARK_RED + "Dieser Spieler ist bereits in einer Gilde!";

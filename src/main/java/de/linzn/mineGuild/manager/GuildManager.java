@@ -122,6 +122,16 @@ public class GuildManager {
             return;
         }
 
+        if (InternalGuildManager.hasPendingConfirm(guildPlayer.getUUID())) {
+            actorP.sendMessage(LanguageDB.waiting_command);
+            return;
+        }
+
+        if (!InternalGuildManager.waitForGuildConfirm(guildPlayer.getUUID(), guild.guildUUID)) {
+            actorP.sendMessage(LanguageDB.guild_action_canceled);
+            return;
+        }
+
         guild.set_guild_home(location);
         ProxyServer.getInstance().getScheduler().runAsync(MineGuildPlugin.inst(), () -> GuildQuery.set_guild_home(guild.guildUUID, location));
         guild.broadcastInGuild(LanguageDB.guild_new_Home.replace("{actor}", actorP.getName()));
@@ -154,6 +164,16 @@ public class GuildManager {
         }
         if (newMaster == guildPlayer) {
             actorP.sendMessage(LanguageDB.player_action_not_possible);
+            return;
+        }
+
+        if (InternalGuildManager.hasPendingConfirm(guildPlayer.getUUID())) {
+            actorP.sendMessage(LanguageDB.waiting_command);
+            return;
+        }
+
+        if (!InternalGuildManager.waitForGuildConfirm(guildPlayer.getUUID(), guild.guildUUID)) {
+            actorP.sendMessage(LanguageDB.guild_action_canceled);
             return;
         }
 
@@ -250,6 +270,16 @@ public class GuildManager {
 
         if (GuildDatabase.isGuild(guildName)) {
             actorP.sendMessage(LanguageDB.guild_already_exist);
+            return;
+        }
+
+        if (InternalGuildManager.hasPendingConfirm(guildPlayer.getUUID())) {
+            actorP.sendMessage(LanguageDB.waiting_command);
+            return;
+        }
+
+        if (!InternalGuildManager.waitForGuildConfirm(guildPlayer.getUUID(), guild.guildUUID)) {
+            actorP.sendMessage(LanguageDB.guild_action_canceled);
             return;
         }
 
@@ -413,6 +443,16 @@ public class GuildManager {
 
         if (kickedGuildPlayer.getGuildRang().priority <= guildPlayer.getGuildRang().priority) {
             actorP.sendMessage(LanguageDB.you_no_guild_perm);
+            return;
+        }
+
+        if (InternalGuildManager.hasPendingConfirm(guildPlayer.getUUID())) {
+            actorP.sendMessage(LanguageDB.waiting_command);
+            return;
+        }
+
+        if (!InternalGuildManager.waitForGuildConfirm(guildPlayer.getUUID(), guild.guildUUID)) {
+            actorP.sendMessage(LanguageDB.guild_action_canceled);
             return;
         }
 
