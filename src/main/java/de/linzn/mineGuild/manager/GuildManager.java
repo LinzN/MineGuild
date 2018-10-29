@@ -248,6 +248,11 @@ public class GuildManager {
             return;
         }
 
+        if (GuildDatabase.isGuild(guildName)) {
+            actorP.sendMessage(LanguageDB.guild_already_exist);
+            return;
+        }
+
         guild.set_guild_name(guildName);
         guild.broadcastInGuild(LanguageDB.guild_change_name.replace("{actor}", actorP.getName()).replace("{guild}", guild.guildName));
 
