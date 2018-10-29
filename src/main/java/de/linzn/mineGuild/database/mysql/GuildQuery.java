@@ -18,6 +18,7 @@ import de.linzn.mineGuild.objects.GuildPlayer;
 import de.linzn.mineGuild.objects.GuildRang;
 import de.linzn.mineSuite.bungee.database.mysql.setup.MySQLConnectionManager;
 import de.linzn.mineSuite.bungee.utils.Location;
+import de.linzn.openJL.converter.BooleanAdapter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -109,10 +110,7 @@ public class GuildQuery {
             Connection conn = manager.getConnection("MineSuiteGuild");
             PreparedStatement insert = null;
             for (GuildRang guildRang : guild.guildRangs) {
-                int rang_fixed = 0;
-                if (guildRang.fixed){
-                    rang_fixed = 1;
-                }
+                int rang_fixed = BooleanAdapter.adapt(guildRang.fixed);
                 insert = conn
                         .prepareStatement("INSERT INTO guild_rang (rang_uuid, guild_uuid, rang_name, rang_priority, rang_fixed) VALUES ('" + guildRang.rangUUID.toString() + "', '"
                                 + guild.guildUUID.toString() + "', '" + guildRang.rangName + "', '" + guildRang.priority + "', '" + rang_fixed + "');");
@@ -337,11 +335,7 @@ public class GuildQuery {
                 UUID rang_uuid = UUID.fromString(result.getString("rang_uuid"));
                 String rang_name = result.getString("rang_name");
                 int rang_priority = result.getInt("rang_priority");
-                int fixed = result.getInt("rang_fixed");
-                boolean rang_fixed = false;
-                if (fixed == 1){
-                    rang_fixed = true;
-                }
+                boolean rang_fixed = BooleanAdapter.adapt(result.getInt("rang_fixed"));
                 GuildRang guildRang = new GuildRang(rang_name, rang_uuid, rang_priority, rang_fixed);
                 ArrayList<GuildPermission> permissions = private_get_rang_permission(rang_uuid);
                 for (GuildPermission permission : permissions) {
