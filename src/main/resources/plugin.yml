@@ -3,3 +3,4 @@ main : de.linzn.mineGuild.MineGuildPlugin
 version: ${project.version}
 author: Kekshaus
 depend: [MineSuiteBungee]
+softDepends: [BungeeTabListPlus]

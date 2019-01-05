@@ -12,6 +12,7 @@
 package de.linzn.mineGuild;
 
 
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import de.linzn.jSocket.server.JServer;
 import de.linzn.mineGuild.commands.GuildMigrate;
 import de.linzn.mineGuild.listener.ConnectionListener;
@@ -26,6 +27,7 @@ import de.linzn.mineGuild.socket.rangStream.JServerGuildRangListener;
 import de.linzn.mineGuild.socket.rangStream.JServerGuildRangOutput;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateListener;
 import de.linzn.mineGuild.socket.updateStream.JServerGuildUpdateOutput;
+import de.linzn.mineGuild.utils.BungeeTabListPlusHook;
 import de.linzn.mineGuild.utils.GuildChat;
 import de.linzn.mineSuite.bungee.MineSuiteBungeePlugin;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
@@ -57,5 +59,10 @@ public class MineGuildPlugin extends Plugin {
         this.getProxy().getPluginManager().registerListener(this, new ConnectionListener());
 
         ChatManager.registerChat(new GuildChat());
+
+        if (this.getProxy().getPluginManager().getPlugin("BungeeTabListPlus") != null) {
+            BungeeTabListPlusAPI.registerVariable(this, new BungeeTabListPlusHook());
+            this.getLogger().info("Hooked into bungeeTablistPlus!");
+        }
     }
 }

@@ -263,7 +263,7 @@ public class GuildManager {
             return;
         }
 
-        if (guild.guildName.equalsIgnoreCase(guildName)){
+        if (guild.guildName.equalsIgnoreCase(guildName)) {
             actorP.sendMessage(LanguageDB.same_guild_name);
             return;
         }

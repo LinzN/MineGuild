@@ -81,4 +81,6 @@ public class LanguageDB {
     public static String interface_playerinfo_player = ChatColor.GREEN + "Spieler: " + ChatColor.YELLOW + "{player}";
     public static String interface_playerinfo_guild = ChatColor.GREEN + "Gilde: " + ChatColor.YELLOW + "{guild}";
     public static String interface_playerinfo_rangname = ChatColor.GREEN + "Rang: " + ChatColor.YELLOW + "{rangname}";
+
+    public static String bungeetablist_no_guild = "Keine Gilde";
 }
