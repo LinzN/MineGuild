@@ -27,6 +27,8 @@ import de.linzn.mineSuite.bungee.database.mysql.BungeeQuery;
 import de.linzn.mineSuite.bungee.module.chat.ChatManager;
 import de.linzn.mineSuite.bungee.module.chat.IChatChannel;
 import de.linzn.mineSuite.bungee.module.core.BungeeManager;
+import de.linzn.mineSuite.bungee.module.economy.EconomyManager;
+import de.linzn.mineSuite.bungee.module.economy.EconomyType;
 import de.linzn.mineSuite.bungee.module.teleport.TeleportManager;
 import de.linzn.mineSuite.bungee.utils.Location;
 import net.md_5.bungee.api.ProxyServer;
@@ -585,8 +587,7 @@ public class GuildManager {
         int guildLevel = guild.guildLevel;
         double guildExperience = guild.guildExperience;
         double requiredGuildExperience = guild.getGuildRequiredExperience();
-        String server = player.getServer().getInfo().getName();
-        double guildBalance = BungeeManager.request_balance(server, "guild_" + guild.guildUUID.toString());
+        double guildBalance = EconomyManager.getBalance(guild.guildUUID, EconomyType.GUILD);
         double mcmmoShare = PluginUtil.get_mcmmo_multiplikator(guildLevel);
         player.sendMessage(LanguageDB.interface_guildinfo_header);
         player.sendMessage(LanguageDB.interface_guildinfo_name.replace("{guild}", guild.guildName));
