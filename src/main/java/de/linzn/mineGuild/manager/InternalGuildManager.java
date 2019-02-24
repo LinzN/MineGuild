@@ -18,18 +18,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalGuildManager {
-    public static void migrate_guild_data() {
-        HashSet<Guild> old_guilds = GuildQuery.load_old_database_guilds();
-        for (Guild guild : old_guilds) {
-            GuildQuery.setGuild(guild);
-            JServerGuildControlOutput.send_plugin_migrate(guild.guildUUID, guild.guildName);
-            MineGuildPlugin.inst().getLogger().info("Migrate guild " + guild.guildUUID);
-        }
-        GuildManager.loadData();
-        server_data_request("all");
-    }
-
-
     public static void add_exp_to_guild(UUID guildUUID, double data) {
         Guild guild = GuildDatabase.getGuild(guildUUID);
         if (guild == null) {

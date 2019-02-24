@@ -14,7 +14,6 @@ package de.linzn.mineGuild;
 
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import de.linzn.jSocket.server.JServer;
-import de.linzn.mineGuild.commands.GuildMigrate;
 import de.linzn.mineGuild.listener.ConnectionListener;
 import de.linzn.mineGuild.manager.GuildManager;
 import de.linzn.mineGuild.socket.commandStream.JServerGuildCommandListener;
@@ -49,7 +48,6 @@ public class MineGuildPlugin extends Plugin {
         this.getLogger().info("Enable MineGuild");
         inst = this;
         GuildManager.loadData();
-        this.getProxy().getPluginManager().registerCommand(this, new GuildMigrate("guildmigrate"));
         JServer jServer = MineSuiteBungeePlugin.getInstance().getMineJSocketServer().jServer;
         jServer.registerIncomingDataListener(JServerGuildCommandOutput.headerChannel, new JServerGuildCommandListener());
         jServer.registerIncomingDataListener(JServerGuildEditOutput.headerChannel, new JServerGuildEditListener());
